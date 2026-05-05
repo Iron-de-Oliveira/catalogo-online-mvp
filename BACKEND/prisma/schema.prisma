@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Cliente {
+  id        Int      @id @default(autoincrement()) @map("id_cliente")
+  nome      String   @db.VarChar(255)
+  email     String   @unique @db.VarChar(255)
+  senha     String   @db.VarChar(255)
+
+  @@map("clientes")
+}
+
+model Administrador {
+  id        Int       @id @default(autoincrement()) @map("id_administrador")
+  cpf       String    @unique @db.VarChar(11)
+  senha     String    @db.VarChar(255)
+
+  produtos  Produto[]
+
+  @@map("administradores")
+}
+
+model Produto {
+  id              Int           @id @default(autoincrement()) @map("id_produto")
+  nome            String        @db.VarChar(255)
+  categoria       Categoria
+  estoque         Int
+  descricao       String?       @db.VarChar(500)
+  foto            String        @db.VarChar(500)
+  preco           Decimal       @db.Decimal(10, 2)
+  dataCriacao     DateTime      @default(now()) @map("data_criacao")
+
+  administradorId Int           @map("id_administrador")
+  administrador   Administrador @relation(fields: [administradorId], references: [id])
+
+  @@map("produtos")
+}
+
+enum Categoria {
+  COZINHA
+  SALA
+  QUARTO
+  MESAS
+  GUARDA_ROUPAS
+  PECAS
+  RUSTICO
+}
