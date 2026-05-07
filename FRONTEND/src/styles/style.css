@@ -105,9 +105,9 @@ body{
 /* PRODUTOS */
 
 .products-grid{
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .product-card{
@@ -140,9 +140,22 @@ body{
 }
 
 .product-footer button{
-  background: blue;
+  background: #123b5d;
   color: white;
   border: none;
   padding: 5px 10px;
   cursor: pointer;
+}
+.login-btn{
+  background: #123b5d;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.login-btn:hover{
+  background: #0d2a42;
 }

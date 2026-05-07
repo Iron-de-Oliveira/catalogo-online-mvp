@@ -24,9 +24,9 @@ function Home() {
   </div>
 
   {/* LOGIN */}
-  <div className="login-icon">
-    👤
-  </div>
+  <div className="login-area">
+  <button className="login-btn">Entrar / Cadastrar</button>
+</div>
 
 </header>
 
