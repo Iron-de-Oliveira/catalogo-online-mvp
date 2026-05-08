@@ -41,15 +41,8 @@ function Home() {
           </h1>
 
           <button>Ver Produtos</button>
-        </div>
-
-        <div className="hero-image">
-          <img
-            src="/mesa.png"
-            alt="Banner"
-          />
-        </div>
-
+        
+        </div>      
       </section>
 
       {/* CATEGORIAS */}
@@ -112,6 +105,18 @@ function Home() {
           </div>
         </div>
 
+        <div className="product-card">
+  <img src="/cadeira-madeira.png" alt="Produto" />
+
+  <h3>Cadeira de Madeira</h3>
+
+  <div className="product-footer">
+    <span>R$ 375</span>
+
+    <button>Ver Mais</button>
+  </div>
+</div>
+
       </section>
       <section className="products-grid">
 
@@ -162,6 +167,18 @@ function Home() {
             <button>Ver Mais</button>
           </div>
         </div>
+
+        <div className="product-card">
+  <img src="/cadeira-madeira.png" alt="Produto" />
+
+  <h3>Cadeira de Madeira</h3>
+
+  <div className="product-footer">
+    <span>R$ 375</span>
+
+    <button>Ver Mais</button>
+  </div>
+</div>
 
       </section>
 
