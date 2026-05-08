@@ -54,11 +54,11 @@ function Home() {
 
       {/* CATEGORIAS */}
       <nav className="categories">
-        <button>PRONTA ENTREGA</button>
-        <button>MESAS DE JANTAR</button>
-        <button>GUARDA ROUPAS</button>
-        <button>CADEIRAS</button>
-        <button>+ CATEGORIAS</button>
+        <button>PRONTA ENTREGA ▼</button>
+        <button>MESAS DE JANTAR ▼</button>
+        <button>GUARDA ROUPAS ▼</button>
+        <button>CADEIRAS ▼</button>
+        <button>+ CATEGORIAS ▼</button>
       </nav>
 
       {/* PRODUTOS */}
