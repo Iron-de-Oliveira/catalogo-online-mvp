@@ -79,17 +79,18 @@ body{
 /* TEXTO */
 
 .hero-text{
-  width: 40%;
+  width: 38%;
 }
 
 /* TÍTULO */
 
-.hero-text h1{
+ .hero-text h1{
   color: #123b5d;
-  font-size: 22px;
-  line-height: 1.2;
-  font-weight: bold;
+
+  font-size: 20px;
   margin-bottom: 20px;
+
+  text-shadow: 1px 1px 4px rgba(255,255,255,0.7);
 }
 
 /* BOTÃO */
