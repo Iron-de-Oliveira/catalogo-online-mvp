@@ -58,4 +58,4 @@ class ProdutoController {
   }
 }
 
-module.exports = ProdutoController
+module.exports = new ProdutoController()
