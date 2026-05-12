@@ -3,6 +3,7 @@ const { Router } = require('express')
 const produtoController = require('../controllers/ProdutoController')
 const administradorController = require('../controllers/AdministradorController')
 const userController = require('../controllers/UserController')
+const authRoutes = require('./authRoutes')
 
 const routes = Router()
 
@@ -11,6 +12,8 @@ routes.get('/', (req, res) => {
     message: 'API do catálogo online funcionando!'
   })
 })
+// Rotas para autenticação
+routes.use('/auth', authRoutes)
 
 // Rotas para administradores
 routes.post('/administradores', administradorController.criar)

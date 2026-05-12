@@ -57,3 +57,10 @@ enum Categoria {
   PECAS
   RUSTICO
 }
+model Usuario {
+  id        String   @id @default(uuid())
+  nome      String
+  email     String   @unique
+  senha     String
+  createdAt DateTime @default(now())
+}
