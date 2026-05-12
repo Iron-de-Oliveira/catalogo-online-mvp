@@ -1,4 +1,5 @@
 const { Router } = require('express')
+const auth = require('../middlewares/auth')
 
 const produtoController = require('../controllers/ProdutoController')
 const administradorController = require('../controllers/AdministradorController')
@@ -19,19 +20,19 @@ routes.use('/auth', authRoutes)
 routes.post('/administradores', administradorController.criar)
 
 // Rotas para produtos
-routes.get('/produtos', produtoController.listar)
-routes.get('/produtos/id/:id', produtoController.listarPorId)
-routes.get('/produtos/categoria/:categoria', produtoController.listarPorCategoria)
-routes.put('/produtos/id/:id', produtoController.atualizar)
-routes.post('/produtos', produtoController.criar)
-routes.delete('/produtos/id/:id', produtoController.deletar)
+routes.get('/produtos', auth, produtoController.listar)
+routes.get('/produtos/id/:id', auth, produtoController.listarPorId)
+routes.get('/produtos/categoria/:categoria', auth, produtoController.listarPorCategoria)
+routes.put('/produtos/id/:id', auth, produtoController.atualizar)
+routes.post('/produtos', auth, produtoController.criar)
+routes.delete('/produtos/id/:id', auth, produtoController.deletar)
 
 // Rotas para usuários
 routes.post('/usuarios', userController.criar)
-routes.get('/usuarios', userController.listar)
-routes.get('/usuarios/id/:id', userController.encontrarPorId)
-routes.get('/usuarios/email/:email', userController.encontrarPorEmail)
-routes.delete('/usuarios/email/:email', userController.deletarPorEmail)
-routes.put('/usuarios/email/:email', userController.atualizarPorEmail)
+routes.get('/usuarios', auth, userController.listar)
+routes.get('/usuarios/id/:id', auth, userController.encontrarPorId)
+routes.get('/usuarios/email/:email', auth, userController.encontrarPorEmail)
+routes.delete('/usuarios/email/:email', auth, userController.deletarPorEmail)
+routes.put('/usuarios/email/:email', auth, userController.atualizarPorEmail)
 
 module.exports = routes
