@@ -117,6 +117,59 @@ class UserController {
       } 
     }
 
+    // deletar um usuário por email
+    async deletarPorEmail(req, res) {
+      try {
+        const { email } = req.params
+        const usuario = await prisma.cliente.delete({
+            where: {
+                email
+            }
+        })  
+        if (!usuario) {
+            return res.status(404).json({
+                error: 'Usuário não encontrado.'
+            })
+        }   
+        return res.status(200).json({
+            message: 'Usuário deletado com sucesso.'
+        })
+      } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+          error: 'Erro ao deletar usuário.'
+        })
+      } 
+    }
+
+    // atualizar um usuário por email
+    async atualizarPorEmail(req, res) {
+      try {
+        const { email } = req.params
+        const { nome, senha } = req.body
+        const usuario = await prisma.cliente.update({
+            where: {
+                email
+            },
+            data: {
+                nome,
+                senha
+            }
+        })
+        if (!usuario) {
+            return res.status(404).json({
+                error: 'Usuário não encontrado.'
+            })
+        }
+        return res.status(200).json(usuario)
+      } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+          error: 'Erro ao atualizar usuário.'
+        })
+      }     
+    }
+
 }
 
 module.exports = new UserController()
