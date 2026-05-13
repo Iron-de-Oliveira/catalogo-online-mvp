@@ -29,7 +29,7 @@ routes.delete('/produtos/id/:id', auth, produtoController.deletar)
 
 // Rotas para usuários
 routes.post('/usuarios', userController.criar)
-routes.get('/usuarios', auth, userController.listar)
+routes.get('/usuarios', userController.listar)
 routes.get('/usuarios/id/:id', auth, userController.encontrarPorId)
 routes.get('/usuarios/email/:email', auth, userController.encontrarPorEmail)
 routes.delete('/usuarios/email/:email', auth, userController.deletarPorEmail)
