@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import "../styles/style.css";
+import { Link } from "react-router-dom";
 
 function Home() {
   return (
@@ -24,9 +25,11 @@ function Home() {
   </div>
 
   {/* LOGIN */}
-  <div className="login-area">
-  <button className="login-btn">Entrar / Cadastrar</button>
-</div>
+  <Link to="/login">
+  <button className="login-btn">
+    Entrar
+  </button>
+</Link>
 
 </header>
 
