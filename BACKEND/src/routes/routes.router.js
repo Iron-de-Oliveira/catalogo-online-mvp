@@ -20,7 +20,7 @@ routes.use('/auth', authRoutes)
 routes.post('/administradores', administradorController.criar)
 
 // Rotas para produtos
-routes.get('/produtos', auth, produtoController.listar)
+routes.get('/produtos', produtoController.listar)
 routes.get('/produtos/id/:id', auth, produtoController.listarPorId)
 routes.get('/produtos/categoria/:categoria', auth, produtoController.listarPorCategoria)
 routes.put('/produtos/id/:id', auth, produtoController.atualizar)

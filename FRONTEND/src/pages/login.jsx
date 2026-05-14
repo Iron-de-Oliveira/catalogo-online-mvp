@@ -1,11 +1,155 @@
 
 import { useState } from "react";
+import { useNavigate } from 'react-router-dom'
+import "../styles/login.css";
+import api from "../services/server";
 import "../styles/login.css";
 
-function LoginPage() {
 
-  // CONTROLE DAS TELAS
-  const [tela, setTela] = useState("inicio");
+
+// função principal de login 
+function LoginPage() {
+  const navigate = useNavigate()
+
+// ESTADOS PARA GERENCIAR TELAS E FORMULÁRIOS
+
+  const [tela, setTela] = useState("inicio")
+  const [cadastro, setCadastro] = useState({
+  nome: "",
+  email: "",
+  senha: ""
+});
+
+// MENSAGENS DE SUCESSO E ERRO
+const [mensagem, setMensagem] = useState("");
+const [erro, setErro] = useState("");
+const [carregando, setCarregando] = useState(false);
+
+function handleCadastroChange(event) {
+  const { name, value } = event.target;
+
+  setCadastro({
+    ...cadastro,
+    [name]: value
+  });
+}
+
+function limparCadastro() {
+  setCadastro({
+    nome: "",
+    email: "",
+    senha: ""
+  });
+
+  setMensagem("");
+  setErro("");
+}
+
+async function cadastrarUsuario() {
+  try {
+    setCarregando(true);
+    setErro("");
+    setMensagem("");
+
+    const response = await api.post("/auth/register", cadastro);
+
+    setMensagem("Usuário cadastrado com sucesso!");
+
+    setCadastro({
+      nome: "",
+      email: "",
+      senha: ""
+    });
+
+    console.log("Usuário criado:", response.data);
+
+    setTimeout(() => {
+      setTela("cliente");
+    }, 1500);
+
+  } catch (error) {
+    console.log(error);
+
+    if (error.response?.data?.error) {
+      setErro(error.response.data.error);
+    } else {
+      setErro("Erro ao cadastrar usuário.");
+    }
+
+  } finally {
+    setCarregando(false);
+  }
+}
+
+// ESTADOS PARA LOGIN
+const [loginCliente, setLoginCliente] = useState({
+  email: "",
+  senha: ""
+});
+
+const [mensagemLogin, setMensagemLogin] = useState("");
+const [erroLogin, setErroLogin] = useState("");
+const [carregandoLogin, setCarregandoLogin] = useState(false);
+
+// função para lidar com mudanças no formulário de login,
+//  capturar inputs e atualizar o estado loginCliente
+function handleLoginClienteChange(event) {
+  const { name, value } = event.target;
+
+  setLoginCliente({
+    ...loginCliente,
+    [name]: value
+  });
+}
+
+// função para realizar login do cliente, enviar dados para API
+//e lidar com respostas
+async function fazerLoginCliente() {
+  try {
+
+    setCarregandoLogin(true)
+    setErroLogin("")
+    setMensagemLogin("")
+
+    const response = await api.post(
+      "/auth/login",
+      loginCliente
+    )
+
+    console.log("Login realizado:", response.data)
+
+    localStorage.setItem(
+      "token",
+      response.data.token
+    )
+
+    localStorage.setItem(
+      "usuario",
+      JSON.stringify(response.data.usuario)
+    )
+
+    setMensagemLogin("Login realizado com sucesso!")
+
+    localStorage.setItem("token", response.data.token)
+    localStorage.setItem("usuario", JSON.stringify(response.data.usuario))
+
+    navigate('/home')
+
+  } catch (error) {
+
+    console.log(error)
+
+    if (error.response?.data?.error) {
+      setErroLogin(error.response.data.error)
+    } else {
+      setErroLogin("Erro ao realizar login.")
+    }
+
+  } finally {
+    setCarregandoLogin(false)
+  }
+}
+
 
   return (
     <div className="container">
@@ -68,24 +212,43 @@ function LoginPage() {
 
             <input
               type="email"
+              name="email"
               placeholder="****@gmail.com"
+              value={loginCliente.email}
+              onChange={handleLoginClienteChange}
             />
 
             <label>Insira senha:</label>
 
             <input
               type="password"
+              name="senha"
               placeholder="********"
+              value={loginCliente.senha}
+              onChange={handleLoginClienteChange}
             />
 
             <div className="buttons">
 
-              <button className="btn-clear">
+               <button
+                className="btn-clear"
+                type="button"
+                onClick={() => {
+                  setLoginCliente({ email: "", senha: "" });
+                  setMensagemLogin("");
+                  setErroLogin("");
+                }}
+              >
                 limpar
               </button>
 
-              <button className="btn-enter">
-                Entrar
+              <button
+                className="btn-enter"
+                type="button"
+                onClick={fazerLoginCliente}
+                disabled={carregandoLogin}
+              >
+                {carregandoLogin ? "Entrando..." : "Entrar"}
               </button>
 
             </div>
@@ -103,7 +266,8 @@ function LoginPage() {
             >
               ⬅ Sair
             </button>
-
+            {mensagemLogin && <p className="success-message">{mensagemLogin}</p>}
+            {erroLogin && <p className="error-message">{erroLogin}</p>}
           </div>
         )}
 
@@ -163,31 +327,49 @@ function LoginPage() {
 
             <input
               type="text"
-              placeholder="Jonas judas josisas"
+              name="nome"
+              placeholder="Jonas Judas Josias"
+              value={cadastro.nome}
+              onChange={handleCadastroChange}
             />
 
             <label>Inserir email:</label>
 
             <input
               type="email"
+              name="email"
               placeholder="JJJ@gmail.com"
+              value={cadastro.email}
+              onChange={handleCadastroChange}
             />
 
             <label>Crie uma senha:</label>
 
             <input
               type="password"
+              name="senha"
               placeholder="**********"
+              value={cadastro.senha}
+              onChange={handleCadastroChange}
             />
 
             <div className="buttons">
 
-              <button className="btn-clear">
+              <button
+                className="btn-clear"
+                onClick={limparCadastro}
+                type="button"
+                >
                 limpar
               </button>
 
-              <button className="btn-enter">
-                Cadastrar
+              <button
+                className="btn-enter"
+                onClick={cadastrarUsuario}
+                type="button"
+                disabled={carregando}
+                >
+                {carregando ? "Cadastrando..." : "Cadastrar"}
               </button>
 
             </div>
@@ -198,6 +380,9 @@ function LoginPage() {
             >
               ⬅ Sair
             </button>
+
+            {mensagem && <p className="success-message">{mensagem}</p>}
+            {erro && <p className="error-message">{erro}</p>}
 
           </div>
         )}
