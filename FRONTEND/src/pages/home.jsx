@@ -1,22 +1,7 @@
-import { useState } from 'react'
-
 import "../styles/style.css";
 import { Link } from "react-router-dom";
 
 function Home() {
-
-  const [pagina, setPagina] = useState("home");
-
-  // LOGIN
-  if (pagina === "login") {
-    return <Login />;
-  }
-
-  // PRODUTO
-  if (pagina === "produto") {
-    return <Produto />;
-  }
-
   return (
     <div className="home-container">
 
@@ -40,14 +25,11 @@ function Home() {
 
         {/* LOGIN */}
         <div className="login-area">
-
-          <button
-            className="login-btn"
-            onClick={() => setPagina("login")}
-          >
-            Entrar / Cadastrar
-          </button>
-
+          <Link to="/login">
+            <button type="button" className="login-btn">
+              Entrar / Cadastrar
+            </button>
+          </Link>
         </div>
 
       </header>
