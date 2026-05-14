@@ -1,9 +1,12 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import Home from "./pages/home"
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
 
-createRoot(document.getElementById('root')).render(
+import Routes from "./routes/routes";
+
+import "./styles/style.css";
+
+createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <Home />
-  </StrictMode>,
-)
+    <Routes />
+  </StrictMode>
+);

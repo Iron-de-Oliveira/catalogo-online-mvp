@@ -1,9 +1,7 @@
 import { useState } from 'react'
 
 import "../styles/style.css";
-
-import Login from "./Login";
-import Produto from "./Produto";
+import { Link } from "react-router-dom";
 
 function Home() {
 
