@@ -3,16 +3,18 @@ const prisma = require('../config/prisma')
 class ProdutoController {
   // listar todos os produtos cadastrados
   async listar(req, res) {
-    try {
-      const produtos = await prisma.produto.findMany()
+  try {
+    const produtos = await prisma.produto.findMany()
 
-      return res.status(200).json(produtos)
-    } catch (error) {
-      return res.status(500).json({
-        error: 'Erro ao listar produtos.'
-      })
-    }
+    return res.status(200).json(produtos)
+  } catch (error) {
+    console.log(error)
+
+    return res.status(500).json({
+      error: 'Erro ao listar produtos.'
+    })
   }
+}
 
   // criar um novo produto
   async criar(req, res) {
