@@ -1,11 +1,36 @@
 import "../styles/style.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api, { baseURL } from "../services/server";
 
 function Home() {
   const navigate = useNavigate();
 
   const [logado, setLogado] = useState(!!localStorage.getItem("token"));
+  const [usuario, setUsuario] = useState(null);
+  const [produtos, setProdutos] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const usuarioStorage = localStorage.getItem("usuario");
+
+    if (usuarioStorage) {
+      setUsuario(JSON.parse(usuarioStorage));
+    }
+
+    async function carregarProdutos() {
+      try {
+        const response = await api.get("/produtos");
+        setProdutos(response.data);
+      } catch (error) {
+        console.error("Erro ao carregar produtos:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    carregarProdutos();
+  }, []);
 
   function handleAuthButton() {
     if (logado) {
@@ -13,14 +38,15 @@ function Home() {
       localStorage.removeItem("usuario");
 
       setLogado(false);
-      navigate("/home");
-    } else {
-      navigate("/login");
+      setUsuario(null);
+      return;
     }
+
+    navigate("/login");
   }
 
-  function irParaProduto() {
-    navigate("/produto");
+  function irParaProduto(id) {
+    navigate(`/produto/${id}`);
   }
 
   return (
@@ -36,6 +62,12 @@ function Home() {
         </div>
 
         <div className="login-area">
+          {logado && usuario && (
+            <span className="usuario-logado">
+              Olá, {usuario.nome}
+            </span>
+          )}
+
           <button onClick={handleAuthButton}>
             {logado ? "Sair" : "Entrar / Cadastrar"}
           </button>
@@ -65,107 +97,42 @@ function Home() {
       </nav>
 
       <section className="products-grid">
-        <div className="product-card">
-          <img src="/cadeira.png" alt="Produto" />
-          <h3>Cadeira com estofado</h3>
-
-          <div className="product-footer">
-            <span>R$ 1855</span>
-            <button onClick={irParaProduto}>Ver Mais</button>
+        {loading ? (
+          <div className="loading">
+            Carregando produtos...
           </div>
-        </div>
-
-        <div className="product-card">
-          <img src="/guarda-roupa.png" alt="Produto" />
-          <h3>Guarda Roupa 3 portas</h3>
-
-          <div className="product-footer">
-            <span>R$ 4855</span>
-            <button onClick={irParaProduto}>Ver Mais</button>
+        ) : produtos.length === 0 ? (
+          <div className="no-products">
+            Nenhum produto disponível no momento.
           </div>
-        </div>
+        ) : (
+          produtos.map((produto) => (
+            <div className="product-card" key={produto.id}>
+              <img
+                src={
+                  produto.foto
+                    ? `${baseURL}${produto.foto}`
+                    : "/placeholder.png"
+                }
+                alt={produto.nome}
+              />
 
-        <div className="product-card">
-          <img src="/mesa-redonda.png" alt="Produto" />
-          <h3>Mesa Redonda</h3>
+              <div>
+                <h3>{produto.nome}</h3>
+              </div>
 
-          <div className="product-footer">
-            <span>R$ 3555</span>
-            <button onClick={irParaProduto}>Ver Mais</button>
-          </div>
-        </div>
+              <div className="product-footer">
+                <span>
+                  R$ {Number(produto.preco).toFixed(2)}
+                </span>
 
-        <div className="product-card">
-          <img src="/sofa.png" alt="Produto" />
-          <h3>Sofá Retrô Rústico</h3>
-
-          <div className="product-footer">
-            <span>R$ 4555</span>
-            <button onClick={irParaProduto}>Ver Mais</button>
-          </div>
-        </div>
-
-        <div className="product-card">
-          <img src="/cadeira-madeira.png" alt="Produto" />
-          <h3>Cadeira de Madeira</h3>
-
-          <div className="product-footer">
-            <span>R$ 375</span>
-            <button onClick={irParaProduto}>Ver Mais</button>
-          </div>
-        </div>
-      </section>
-
-      <section className="products-grid">
-        <div className="product-card">
-          <img src="/cadeira.png" alt="Produto" />
-          <h3>Cadeira com estofado</h3>
-
-          <div className="product-footer">
-            <span>R$ 1855</span>
-            <button onClick={irParaProduto}>Ver Mais</button>
-          </div>
-        </div>
-
-        <div className="product-card">
-          <img src="/guarda-roupa.png" alt="Produto" />
-          <h3>Guarda Roupa 3 portas</h3>
-
-          <div className="product-footer">
-            <span>R$ 4855</span>
-            <button onClick={irParaProduto}>Ver Mais</button>
-          </div>
-        </div>
-
-        <div className="product-card">
-          <img src="/mesa-redonda.png" alt="Produto" />
-          <h3>Mesa Redonda</h3>
-
-          <div className="product-footer">
-            <span>R$ 3555</span>
-            <button onClick={irParaProduto}>Ver Mais</button>
-          </div>
-        </div>
-
-        <div className="product-card">
-          <img src="/sofa.png" alt="Produto" />
-          <h3>Sofá Retrô Rústico</h3>
-
-          <div className="product-footer">
-            <span>R$ 4555</span>
-            <button onClick={irParaProduto}>Ver Mais</button>
-          </div>
-        </div>
-
-        <div className="product-card">
-          <img src="/cadeira-madeira.png" alt="Produto" />
-          <h3>Cadeira de Madeira</h3>
-
-          <div className="product-footer">
-            <span>R$ 375</span>
-            <button onClick={irParaProduto}>Ver Mais</button>
-          </div>
-        </div>
+                <button onClick={() => irParaProduto(produto.id)}>
+                  Ver Mais
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </section>
     </div>
   );

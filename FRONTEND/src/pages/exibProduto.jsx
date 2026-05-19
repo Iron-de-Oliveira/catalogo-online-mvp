@@ -1,119 +1,119 @@
-// ProductShowcase.jsx
-import React from "react";
+﻿import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import api, { baseURL } from "../services/server";
 import "../styles/exibProduto.css";
 
-const products = [
-  {
-    id: 1,
-    name: "Cadeira com estofado",
-    price: "185",
-    image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=800",
-  },
-  {
-    id: 2,
-    name: "Guarda Roupa 3 portas",
-    price: "485",
-    image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=800",
-  },
-  {
-    id: 3,
-    name: "Mesa Redonda",
-    price: "355",
-    image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=800",
-  },
-  {
-    id: 4,
-    name: "Sofá Retrô Rústico",
-    price: "455",
-    image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=800",
-  },
-  {
-    id: 5,
-    name: "Poltrona de Madeira",
-    price: "375",
-    image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=800",
-  },
-];
+export default function ExibProduto() {
+  const navigate = useNavigate();
+  const { id } = useParams();
 
-export default function ProductShowcase() {
+  const [produto, setProduto] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    async function carregarProduto() {
+      try {
+        const response = await api.get(`/produtos/id/${id}`);
+        setProduto(response.data);
+      } catch (err) {
+        console.error("Erro ao carregar produto:", err);
+        setError("Não foi possível carregar o produto.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (id) {
+      carregarProduto();
+    }
+  }, [id]);
+
+  const precoAtual = useMemo(() => {
+    return produto ? Number(produto.preco) : 0;
+  }, [produto]);
+
+  const precoAntigo = useMemo(() => {
+    return precoAtual > 0 ? (precoAtual * 1.2).toFixed(2) : "0.00";
+  }, [precoAtual]);
+
+  const estoqueIndisponivel = useMemo(() => {
+    return produto && produto.estoque === 0;
+  }, [produto]);
+
+  if (loading) {
+    return <div className="loading">Carregando produto...</div>;
+  }
+
+  if (error) {
+    return <div className="error">{error}</div>;
+  }
+
+  if (!produto) {
+    return <div className="error">Produto não encontrado.</div>;
+  }
+
   return (
     <div className="showcase-container">
-      {/* TOPO */}
       <div className="product-view">
-        {/* IMAGEM */}
         <div className="product-image">
-          <button className="back-button">←</button>
-
-          <img
-            src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200"
-            alt="Mesa de jantar"
-          />
-        </div>
-
-        {/* INFORMAÇÕES */}
-        <div className="product-info">
-          <h2>
-            MESA JMCAL LIVING 2.2
-            <br />
-            (5583) V/D RET ILUMINADO
-            <br />
-            para 8 pessoas
-          </h2>
-
-          <span className="old-price">De R$ 5.230,00 por</span>
-
-          <h1>R$ 4.404,00</h1>
-
-          <p className="installments">Em estoque • 4x</p>
-
-          <button className="whatsapp-btn">
-            WhatsApp
+          <button className="back-button" onClick={() => navigate(-1)}>
+            ←
           </button>
 
-          <div className="details-box">
-            <p>
-              Mesa de jantar JMCAL Living
-              <br />
-              com madeira MDF.
-            </p>
+          <img src={produto.foto ? `${baseURL}${produto.foto}` : "/placeholder.png"} />
+        </div>
 
-            <ul>
-              <li>Comprimento: 2.20m</li>
-              <li>Largura: 90cm</li>
-              <li>Altura: 75cm</li>
-            </ul>
+        <div className="product-info">
+          <div className="product-info-main">
+            <h2>{produto.nome}</h2>
+            
+            <div className="price-section">
+              <span className="old-price">De R$ {precoAntigo} por</span>
+              <h1>R$ {precoAtual.toFixed(2)}</h1>
+              <p className="installments">
+                {produto.estoque > 0
+                  ? `Em estoque • ${produto.estoque}`
+                  : "Fora de estoque"}
+              </p>
+
+              <button className="whatsapp-btn">
+                Finalize sua compra pelo WhatsApp
+              </button> 
+            </div>  
           </div>
+        </div>
+          
 
-          <div className="stock">
-            <strong>Estoque disponível.</strong>
-            <p>Personalize e entregue com nosso vendedor no WhatsApp.</p>
+        <div className="details-box">
+          <p><strong>{produto.nome}</strong></p>
+          <div className={`stock ${estoqueIndisponivel ? 'unavailable' : ''}`}>
+            <strong>
+              {estoqueIndisponivel ? "Estoque indisponível." : "Estoque disponível."}
+            </strong>
+            <p>
+              {estoqueIndisponivel
+              ? "Este produto está temporariamente fora de estoque."
+              : "Personalize a entrega com nosso vendedor no WhatsApp."}
+            </p>
           </div>
         </div>
       </div>
 
-      {/* DIVISOR */}
       <div className="divider"></div>
 
-      {/* LISTA DE PRODUTOS */}
-      <div className="products-grid">
-        {products.map((item) => (
-          <div className="product-card" key={item.id}>
-            <img src={item.image} alt={item.name} />
-
-            <p className="product-name">{item.name}</p>
-
+      <div className="related-products-container">
+        <h3>Produtos Relacionados</h3>
+        <div className="products-grid">
+          <div className="product-card">
+            <img src="/placeholder.png" alt="Produto" />
+            <p className="product-name">Produto Exemplo</p>
             <div className="card-footer">
-              <span>R$ {item.price}</span>
-
+              <span>R$ 100.00</span>
               <button>Ver Mais</button>
             </div>
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );

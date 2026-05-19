@@ -230,7 +230,7 @@ async function fazerLoginCliente() {
 
             <div className="buttons">
 
-               <button
+              <button
                 className="btn-clear"
                 type="button"
                 onClick={() => {
@@ -238,7 +238,7 @@ async function fazerLoginCliente() {
                   setMensagemLogin("");
                   setErroLogin("");
                 }}
-              >
+              > 
                 limpar
               </button>
 
