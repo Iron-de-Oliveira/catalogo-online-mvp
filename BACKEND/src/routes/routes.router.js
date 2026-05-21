@@ -32,7 +32,7 @@ routes.post('/upload', upload.single('foto'), (req, res) => {
 routes.use('/auth', authRoutes)
 
 // Rotas para administradores
-routes.post('/administradores', administradorController.criar)
+routes.post('/administradores',auth, administradorController.criar)
 
 // Rotas para produtos
 routes.get('/produtos', produtoController.listar)

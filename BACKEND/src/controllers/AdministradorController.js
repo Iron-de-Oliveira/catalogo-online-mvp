@@ -1,4 +1,5 @@
 const prisma = require('../config/prisma')
+const bcrypt = require('bcryptjs')
 
 class AdministradorController {
   async criar(req, res) {
@@ -11,10 +12,12 @@ class AdministradorController {
         })
       }
 
+      const senhaHash = await bcrypt.hash(senha, 10)
+
       const administrador = await prisma.administrador.create({
         data: {
           cpf,
-          senha
+          senha: senhaHash
         }
       })
 

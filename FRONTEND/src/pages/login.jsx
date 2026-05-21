@@ -87,6 +87,16 @@ const [loginCliente, setLoginCliente] = useState({
   senha: ""
 });
 
+  // ESTADOS PARA LOGIN ADMIN
+  const [loginAdmin, setLoginAdmin] = useState({
+    cpf: "",
+    senha: ""
+  });
+
+  const [mensagemLoginAdmin, setMensagemLoginAdmin] = useState("");
+  const [erroLoginAdmin, setErroLoginAdmin] = useState("");
+  const [carregandoLoginAdmin, setCarregandoLoginAdmin] = useState(false);
+
 const [mensagemLogin, setMensagemLogin] = useState("");
 const [erroLogin, setErroLogin] = useState("");
 const [carregandoLogin, setCarregandoLogin] = useState(false);
@@ -98,6 +108,15 @@ function handleLoginClienteChange(event) {
 
   setLoginCliente({
     ...loginCliente,
+    [name]: value
+  });
+}
+
+function handleLoginAdminChange(event) {
+  const { name, value } = event.target;
+
+  setLoginAdmin({
+    ...loginAdmin,
     [name]: value
   });
 }
@@ -133,7 +152,7 @@ async function fazerLoginCliente() {
     localStorage.setItem("token", response.data.token)
     localStorage.setItem("usuario", JSON.stringify(response.data.usuario))
 
-    navigate('/home')
+    navigate('/')
 
   } catch (error) {
 
@@ -147,6 +166,36 @@ async function fazerLoginCliente() {
 
   } finally {
     setCarregandoLogin(false)
+  }
+}
+
+async function fazerLoginAdmin() {
+  try {
+    setCarregandoLoginAdmin(true)
+    setErroLoginAdmin("")
+    setMensagemLoginAdmin("")
+
+    const response = await api.post(
+      "/auth/login-admin",
+      loginAdmin
+    )
+
+    localStorage.setItem("token", response.data.token)
+    localStorage.setItem("administrador", JSON.stringify(response.data.administrador))
+
+    setMensagemLoginAdmin("Login do administrador realizado com sucesso!")
+
+    navigate('/admin')
+  } catch (error) {
+    console.log(error)
+
+    if (error.response?.data?.error) {
+      setErroLoginAdmin(error.response.data.error)
+    } else {
+      setErroLoginAdmin("Erro ao realizar login do administrador.")
+    }
+  } finally {
+    setCarregandoLoginAdmin(false)
   }
 }
 
@@ -279,24 +328,31 @@ async function fazerLoginCliente() {
 
             <h1>Seja bem vindo!</h1>
 
+
             <label>Insira CPF:</label>
 
             <input
               type="text"
-              placeholder="000.555.999-88"
+              name="cpf"
+              placeholder="00055599988"
+              value={loginAdmin.cpf}
+              onChange={handleLoginAdminChange}
             />
 
             <label>Insira senha:</label>
 
             <input
               type="password"
+              name="senha"
               placeholder="********"
+              value={loginAdmin.senha}
+              onChange={handleLoginAdminChange}
             />
 
             <div className="buttons">
 
-              <button className="btn-enter">
-                Entrar
+              <button className="btn-enter" type="button" onClick={fazerLoginAdmin} disabled={carregandoLoginAdmin}>
+                {carregandoLoginAdmin ? "Entrando..." : "Entrar"}
               </button>
 
               <button className="btn-clear">
@@ -304,6 +360,9 @@ async function fazerLoginCliente() {
               </button>
 
             </div>
+
+            {mensagemLoginAdmin && <p className="success-message">{mensagemLoginAdmin}</p>}
+            {erroLoginAdmin && <p className="error-message">{erroLoginAdmin}</p>}
 
             <button
               className="btn-back"
