@@ -14,6 +14,20 @@ routes.get('/', (req, res) => {
     message: 'API do catálogo online funcionando!'
   })
 })
+
+// Rota para upload de imagens
+routes.post('/upload', upload.single('foto'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'Nenhum arquivo foi enviado' })
+  }
+
+  return res.status(200).json({
+    message: 'Arquivo enviado com sucesso',
+    filename: req.file.filename,
+    url: `/uploads/${req.file.filename}`
+  })
+})
+
 // Rotas para autenticação
 routes.use('/auth', authRoutes)
 
@@ -29,7 +43,7 @@ routes.get('/produtos/categoria/:categoria', produtoController.listarPorCategori
 =======
 // Rotas para produtos
 routes.get('/produtos', produtoController.listar)
-routes.get('/produtos/id/:id', auth, produtoController.listarPorId)
+routes.get('/produtos/id/:id', produtoController.listarPorId)
 routes.get('/produtos/categoria/:categoria', auth, produtoController.listarPorCategoria)
 routes.put('/produtos/id/:id', auth, produtoController.atualizar)
 routes.post('/produtos', auth, produtoController.criar)

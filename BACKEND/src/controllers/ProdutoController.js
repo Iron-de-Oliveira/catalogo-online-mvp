@@ -18,48 +18,65 @@ class ProdutoController {
 
   // criar um novo produto
   async criar(req, res) {
-    try {
-      const {
-        nome,
-        categoria,
-        estoque,
-        descricao,
-        foto,
-        preco,
-        idAdministrador
-      } = req.body
+  try {
 
-      if (!nome || !categoria || estoque === undefined || !foto || !preco || !idAdministrador) {
-        return res.status(400).json({
-          error: 'Por favor, preencha todos os campos obrigatórios.'
-        })
-      }
+    const {
+      nome,
+      categoria,
+      estoque,
+      descricao,
+      preco,
+      idAdministrador
+    } = req.body
 
-      const produto = await prisma.produto.create({
-        data: {
+    if (
+      !nome ||
+      !categoria ||
+      !estoque ||
+      !descricao ||
+      !preco ||
+      !idAdministrador
+    ) {
+      return res.status(400).json({
+        error: 'Preencha todos os campos obrigatórios.'
+      })
+    }
+
+    const produto = await prisma.produto.create({
+      data: {
         nome,
-        categoria,
-        estoque,
+
+        categoria: categoria.toUpperCase(),
+
+        estoque: parseInt(estoque),
+
         descricao,
-        foto,
-        preco,
+
+        preco: parseFloat(preco),
+
+        foto: req.file
+          ? `/uploads/${req.file.filename}`
+          : null,
+
         administrador: {
-            connect: {
-            id: idAdministrador
+          connect: {
+            id: Number(idAdministrador)
           }
         }
       }
     })
 
     return res.status(201).json(produto)
-    } catch (error) {
-      console.log(error)
 
-      return res.status(500).json({
-        error: 'Erro ao criar produto.'
-      })
-    }
+  } catch (error) {
+
+    console.log(error)
+
+    return res.status(500).json({
+      error: 'Erro ao criar produto.'
+    })
   }
+}
 
   // listar produtos por categoria
   async listarPorCategoria(req, res) {
