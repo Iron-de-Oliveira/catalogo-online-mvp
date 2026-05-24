@@ -1,11 +1,7 @@
-
 import { useState } from "react";
-import { useNavigate } from 'react-router-dom'
-import "../styles/login.css";
+import { useNavigate } from "react-router-dom";
 import api from "../services/server";
 import "../styles/login.css";
-
-
 
 // função principal de login 
 function LoginPage() {
@@ -201,62 +197,14 @@ async function fazerLoginAdmin() {
 
 
   return (
-    <div className="container">
-
+    <div className="login-container">
       {/* LADO ESQUERDO */}
-      <div className="left-side">
+      <div className="login-left">
+        <h1>Seja bem vindo!</h1>
 
-        {/* ========================= */}
-        {/* TELA INICIAL */}
-        {/* ========================= */}
-        {tela === "inicio" && (
-          <>
-            <h1>Seja bem vindo!</h1>
-
-            <div className="cards">
-
-              {/* CARD LOGIN */}
-              <div className="card">
-                <img
-                  src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3"
-                  alt="Login"
-                />
-
-                <button
-                  className="btn-login"
-                  onClick={() => setTela("cliente")}
-                >
-                  Fazer login
-                </button>
-              </div>
-
-              {/* CARD ADM */}
-              <div className="card">
-                <img
-                  src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2"
-                  alt="ADM"
-                />
-
-                <button
-                  className="btn-adm"
-                  onClick={() => setTela("adm")}
-                >
-                  Acessar como ADM
-                </button>
-              </div>
-
-            </div>
-          </>
-        )}
-
-        {/* ========================= */}
         {/* TELA CLIENTE */}
-        {/* ========================= */}
         {tela === "cliente" && (
-          <div className="form-container">
-
-            <h1>Seja bem vindo!</h1>
-
+          <form className="login-form">
             <label>Inserir email:</label>
 
             <input
@@ -278,7 +226,6 @@ async function fazerLoginAdmin() {
             />
 
             <div className="buttons">
-
               <button
                 className="btn-clear"
                 type="button"
@@ -287,7 +234,7 @@ async function fazerLoginAdmin() {
                   setMensagemLogin("");
                   setErroLogin("");
                 }}
-              > 
+              >
                 limpar
               </button>
 
@@ -299,7 +246,6 @@ async function fazerLoginAdmin() {
               >
                 {carregandoLogin ? "Entrando..." : "Entrar"}
               </button>
-
             </div>
 
             <p
@@ -311,23 +257,21 @@ async function fazerLoginAdmin() {
 
             <button
               className="btn-back"
+              type="button"
               onClick={() => setTela("inicio")}
             >
               ⬅ Sair
             </button>
+
             {mensagemLogin && <p className="success-message">{mensagemLogin}</p>}
             {erroLogin && <p className="error-message">{erroLogin}</p>}
-          </div>
+          </form>
         )}
 
-        {/* ========================= */}
         {/* TELA ADM */}
-        {/* ========================= */}
         {tela === "adm" && (
-          <div className="form-container">
-
-            <h1>Seja bem vindo!</h1>
-
+          <form className="login-form">
+            <h1>Login Administrador</h1>
 
             <label>Insira CPF:</label>
 
@@ -350,100 +294,39 @@ async function fazerLoginAdmin() {
             />
 
             <div className="buttons">
-
-              <button className="btn-enter" type="button" onClick={fazerLoginAdmin} disabled={carregandoLoginAdmin}>
+              <button
+                className="btn-enter"
+                type="button"
+                onClick={fazerLoginAdmin}
+                disabled={carregandoLoginAdmin}
+              >
                 {carregandoLoginAdmin ? "Entrando..." : "Entrar"}
               </button>
 
-              <button className="btn-clear">
+              <button
+                className="btn-clear"
+                type="button"
+                onClick={() => {
+                  setLoginAdmin({ cpf: "", senha: "" });
+                  setMensagemLoginAdmin("");
+                  setErroLoginAdmin("");
+                }}
+              >
                 limpar
               </button>
-
             </div>
-
-            {mensagemLoginAdmin && <p className="success-message">{mensagemLoginAdmin}</p>}
-            {erroLoginAdmin && <p className="error-message">{erroLoginAdmin}</p>}
 
             <button
               className="btn-back"
+              type="button"
               onClick={() => setTela("inicio")}
             >
               ⬅ Sair
             </button>
 
-          </div>
-        )}
-
-        {/* ========================= */}
-        {/* TELA CADASTRO */}
-        {/* ========================= */}
-        {tela === "cadastro" && (
-          <div className="form-container">
-
-            <h1>Seja bem vindo!</h1>
-
-            <label>Nome:</label>
-
-            <input
-              type="text"
-              name="nome"
-              placeholder="Jonas Judas Josias"
-              value={cadastro.nome}
-              onChange={handleCadastroChange}
-            />
-
-            <label>Inserir email:</label>
-
-            <input
-              type="email"
-              name="email"
-              placeholder="JJJ@gmail.com"
-              value={cadastro.email}
-              onChange={handleCadastroChange}
-            />
-
-            <label>Crie uma senha:</label>
-
-            <input
-              type="password"
-              name="senha"
-              placeholder="**********"
-              value={cadastro.senha}
-              onChange={handleCadastroChange}
-            />
-
-            <div className="buttons">
-
-              <button
-                className="btn-clear"
-                onClick={limparCadastro}
-                type="button"
-                >
-                limpar
-              </button>
-
-              <button
-                className="btn-enter"
-                onClick={cadastrarUsuario}
-                type="button"
-                disabled={carregando}
-                >
-                {carregando ? "Cadastrando..." : "Cadastrar"}
-              </button>
-
-            </div>
-
-            <button
-              className="btn-back"
-              onClick={() => setTela("cliente")}
-            >
-              ⬅ Sair
-            </button>
-
-            {mensagem && <p className="success-message">{mensagem}</p>}
-            {erro && <p className="error-message">{erro}</p>}
-
-          </div>
+            {mensagemLoginAdmin && <p className="success-message">{mensagemLoginAdmin}</p>}
+            {erroLoginAdmin && <p className="error-message">{erroLoginAdmin}</p>}
+          </form>
         )}
 
         {/* FOOTER */}
@@ -451,20 +334,16 @@ async function fazerLoginAdmin() {
           <h3>ARTE EM MÓVEIS</h3>
           <p>Powered by decor&arte</p>
         </div>
-
       </div>
 
       {/* LADO DIREITO */}
-      <div className="right-side">
-
-        <div className="box">
+      <div className="login-right">
+        <div className="image-box">
           <img
-            src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85"
+            src="/mesa-redonda.png"
             alt="Mesa"
           />
-        </div>
 
-        <div className="box text-box">
           <p>
             Móveis de madeira:
             <br />
@@ -472,36 +351,32 @@ async function fazerLoginAdmin() {
           </p>
         </div>
 
-        <div className="box text-box">
+        <div className="image-box">
           <p>
             Durabilidade esculpida,
+            <br />
             conforto garantido.
           </p>
-        </div>
 
-        <div className="box">
           <img
-            src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85"
-            alt="Cama"
+            src="/sofa.png"
+            alt="Sofá"
           />
         </div>
 
-        <div className="box">
+        <div className="image-box">
           <img
-            src="https://images.unsplash.com/photo-1517705008128-361805f42e86"
-            alt="Madeira"
+            src="/cadeira-madeira.png"
+            alt="Cadeira"
           />
-        </div>
 
-        <div className="box text-box">
           <p>
             Cada peça,
+            <br />
             uma obra-prima da natureza.
           </p>
         </div>
-
       </div>
-
     </div>
   );
 }

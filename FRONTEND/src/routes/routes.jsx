@@ -5,6 +5,7 @@ import LoginPage from "../pages/login";
 import ExibProduto from "../pages/exibProduto";
 import TesteApi from "../pages/testeApi";
 import PaginaAdministracao from "../pages/PaginaAdministracao";
+import PerfilUsuario from "../pages/perfilusuario";
 
 function AppRoutes() {
   return (
@@ -21,6 +22,7 @@ function AppRoutes() {
 
         <Route path="/admin" element={<PaginaAdministracao />} />
 
+        <Route path="/perfil" element={<PerfilUsuario />} />
       </Routes>
     </BrowserRouter>
   );
