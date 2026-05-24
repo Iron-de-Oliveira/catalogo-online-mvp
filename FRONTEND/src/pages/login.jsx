@@ -1,19 +1,13 @@
-import { useNavigate } from 'react-router-dom'
-import "../styles/login.css";
-import api from "../services/server";
 import "../styles/login.css";
 
 function Login() {
   return (
     <div className="login-container">
-
       {/* LADO ESQUERDO */}
       <div className="login-left">
-
         <h1>Seja bem vindo!</h1>
 
         <form className="login-form">
-
           <label>Inserir email:</label>
 
           <input
@@ -25,19 +19,15 @@ function Login() {
 
           <input
             type="password"
-              name="senha"
             placeholder="********"
-              value={loginCliente.senha}
-              onChange={handleLoginClienteChange}
           />
 
           <div className="buttons">
-
             <button
               type="button"
               className="limpar-btn"
             >
-              limpar
+              Limpar
             </button>
 
             <button
@@ -46,9 +36,7 @@ function Login() {
             >
               Entrar
             </button>
-
           </div>
-
         </form>
 
         <p className="cadastro-text">
@@ -59,34 +47,16 @@ function Login() {
           ⮐ Sair
         </button>
 
-            </div>
-
-            <button
-              className="btn-back"
-              onClick={() => setTela("cliente")}
-            >
-              ⬅ Sair
-            </button>
-
-            {mensagem && <p className="success-message">{mensagem}</p>}
-            {erro && <p className="error-message">{erro}</p>}
-
-          </div>
-        )}
-
         {/* FOOTER */}
         <div className="footer">
           <h3>ARTE EM MÓVEIS</h3>
           <p>Powered by decor&arte</p>
         </div>
-
       </div>
 
       {/* LADO DIREITO */}
       <div className="login-right">
-
         <div className="image-box">
-
           <img
             src="/mesa-redonda.png"
             alt="Mesa"
@@ -94,15 +64,15 @@ function Login() {
 
           <p>
             Móveis de madeira:
+            <br />
             O legado da natureza em seu lar.
           </p>
-
         </div>
 
         <div className="image-box">
-
           <p>
             Durabilidade esculpida,
+            <br />
             conforto garantido.
           </p>
 
@@ -110,11 +80,9 @@ function Login() {
             src="/sofa.png"
             alt="Sofá"
           />
-
         </div>
 
         <div className="image-box">
-
           <img
             src="/cadeira-madeira.png"
             alt="Cadeira"
@@ -122,13 +90,11 @@ function Login() {
 
           <p>
             Cada peça,
+            <br />
             uma obra-prima da natureza.
           </p>
-
         </div>
-
       </div>
-
     </div>
   );
 }
