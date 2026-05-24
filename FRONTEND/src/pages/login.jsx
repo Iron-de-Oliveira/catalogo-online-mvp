@@ -1,376 +1,63 @@
-
-import { useState } from "react";
 import { useNavigate } from 'react-router-dom'
 import "../styles/login.css";
 import api from "../services/server";
 import "../styles/login.css";
 
-
-
-// função principal de login 
-function LoginPage() {
-  const navigate = useNavigate()
-
-// ESTADOS PARA GERENCIAR TELAS E FORMULÁRIOS
-
-  const [tela, setTela] = useState("inicio")
-  const [cadastro, setCadastro] = useState({
-  nome: "",
-  email: "",
-  senha: ""
-});
-
-// MENSAGENS DE SUCESSO E ERRO
-const [mensagem, setMensagem] = useState("");
-const [erro, setErro] = useState("");
-const [carregando, setCarregando] = useState(false);
-
-function handleCadastroChange(event) {
-  const { name, value } = event.target;
-
-  setCadastro({
-    ...cadastro,
-    [name]: value
-  });
-}
-
-function limparCadastro() {
-  setCadastro({
-    nome: "",
-    email: "",
-    senha: ""
-  });
-
-  setMensagem("");
-  setErro("");
-}
-
-async function cadastrarUsuario() {
-  try {
-    setCarregando(true);
-    setErro("");
-    setMensagem("");
-
-    const response = await api.post("/auth/register", cadastro);
-
-    setMensagem("Usuário cadastrado com sucesso!");
-
-    setCadastro({
-      nome: "",
-      email: "",
-      senha: ""
-    });
-
-    console.log("Usuário criado:", response.data);
-
-    setTimeout(() => {
-      setTela("cliente");
-    }, 1500);
-
-  } catch (error) {
-    console.log(error);
-
-    if (error.response?.data?.error) {
-      setErro(error.response.data.error);
-    } else {
-      setErro("Erro ao cadastrar usuário.");
-    }
-
-  } finally {
-    setCarregando(false);
-  }
-}
-
-// ESTADOS PARA LOGIN
-const [loginCliente, setLoginCliente] = useState({
-  email: "",
-  senha: ""
-});
-
-const [mensagemLogin, setMensagemLogin] = useState("");
-const [erroLogin, setErroLogin] = useState("");
-const [carregandoLogin, setCarregandoLogin] = useState(false);
-
-// função para lidar com mudanças no formulário de login,
-//  capturar inputs e atualizar o estado loginCliente
-function handleLoginClienteChange(event) {
-  const { name, value } = event.target;
-
-  setLoginCliente({
-    ...loginCliente,
-    [name]: value
-  });
-}
-
-// função para realizar login do cliente, enviar dados para API
-//e lidar com respostas
-async function fazerLoginCliente() {
-  try {
-
-    setCarregandoLogin(true)
-    setErroLogin("")
-    setMensagemLogin("")
-
-    const response = await api.post(
-      "/auth/login",
-      loginCliente
-    )
-
-    console.log("Login realizado:", response.data)
-
-    localStorage.setItem(
-      "token",
-      response.data.token
-    )
-
-    localStorage.setItem(
-      "usuario",
-      JSON.stringify(response.data.usuario)
-    )
-
-    setMensagemLogin("Login realizado com sucesso!")
-
-    localStorage.setItem("token", response.data.token)
-    localStorage.setItem("usuario", JSON.stringify(response.data.usuario))
-
-    navigate('/home')
-
-  } catch (error) {
-
-    console.log(error)
-
-    if (error.response?.data?.error) {
-      setErroLogin(error.response.data.error)
-    } else {
-      setErroLogin("Erro ao realizar login.")
-    }
-
-  } finally {
-    setCarregandoLogin(false)
-  }
-}
-
-
+function Login() {
   return (
-    <div className="container">
+    <div className="login-container">
 
       {/* LADO ESQUERDO */}
-      <div className="left-side">
+      <div className="login-left">
 
-        {/* ========================= */}
-        {/* TELA INICIAL */}
-        {/* ========================= */}
-        {tela === "inicio" && (
-          <>
-            <h1>Seja bem vindo!</h1>
+        <h1>Seja bem vindo!</h1>
 
-            <div className="cards">
+        <form className="login-form">
 
-              {/* CARD LOGIN */}
-              <div className="card">
-                <img
-                  src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3"
-                  alt="Login"
-                />
+          <label>Inserir email:</label>
 
-                <button
-                  className="btn-login"
-                  onClick={() => setTela("cliente")}
-                >
-                  Fazer login
-                </button>
-              </div>
+          <input
+            type="email"
+            placeholder="usuario@gmail.com"
+          />
 
-              {/* CARD ADM */}
-              <div className="card">
-                <img
-                  src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2"
-                  alt="ADM"
-                />
+          <label>Inserir senha:</label>
 
-                <button
-                  className="btn-adm"
-                  onClick={() => setTela("adm")}
-                >
-                  Acessar como ADM
-                </button>
-              </div>
-
-            </div>
-          </>
-        )}
-
-        {/* ========================= */}
-        {/* TELA CLIENTE */}
-        {/* ========================= */}
-        {tela === "cliente" && (
-          <div className="form-container">
-
-            <h1>Seja bem vindo!</h1>
-
-            <label>Inserir email:</label>
-
-            <input
-              type="email"
-              name="email"
-              placeholder="****@gmail.com"
-              value={loginCliente.email}
-              onChange={handleLoginClienteChange}
-            />
-
-            <label>Insira senha:</label>
-
-            <input
-              type="password"
+          <input
+            type="password"
               name="senha"
-              placeholder="********"
+            placeholder="********"
               value={loginCliente.senha}
               onChange={handleLoginClienteChange}
-            />
+          />
 
-            <div className="buttons">
-
-               <button
-                className="btn-clear"
-                type="button"
-                onClick={() => {
-                  setLoginCliente({ email: "", senha: "" });
-                  setMensagemLogin("");
-                  setErroLogin("");
-                }}
-              >
-                limpar
-              </button>
-
-              <button
-                className="btn-enter"
-                type="button"
-                onClick={fazerLoginCliente}
-                disabled={carregandoLogin}
-              >
-                {carregandoLogin ? "Entrando..." : "Entrar"}
-              </button>
-
-            </div>
-
-            <p
-              className="register"
-              onClick={() => setTela("cadastro")}
-            >
-              Cadastrar-se
-            </p>
+          <div className="buttons">
 
             <button
-              className="btn-back"
-              onClick={() => setTela("inicio")}
+              type="button"
+              className="limpar-btn"
             >
-              ⬅ Sair
+              limpar
             </button>
-            {mensagemLogin && <p className="success-message">{mensagemLogin}</p>}
-            {erroLogin && <p className="error-message">{erroLogin}</p>}
-          </div>
-        )}
-
-        {/* ========================= */}
-        {/* TELA ADM */}
-        {/* ========================= */}
-        {tela === "adm" && (
-          <div className="form-container">
-
-            <h1>Seja bem vindo!</h1>
-
-            <label>Insira CPF:</label>
-
-            <input
-              type="text"
-              placeholder="000.555.999-88"
-            />
-
-            <label>Insira senha:</label>
-
-            <input
-              type="password"
-              placeholder="********"
-            />
-
-            <div className="buttons">
-
-              <button className="btn-enter">
-                Entrar
-              </button>
-
-              <button className="btn-clear">
-                limpar
-              </button>
-
-            </div>
 
             <button
-              className="btn-back"
-              onClick={() => setTela("inicio")}
+              type="submit"
+              className="entrar-btn"
             >
-              ⬅ Sair
+              Entrar
             </button>
 
           </div>
-        )}
 
-        {/* ========================= */}
-        {/* TELA CADASTRO */}
-        {/* ========================= */}
-        {tela === "cadastro" && (
-          <div className="form-container">
+        </form>
 
-            <h1>Seja bem vindo!</h1>
+        <p className="cadastro-text">
+          Cadastrar-se
+        </p>
 
-            <label>Nome:</label>
-
-            <input
-              type="text"
-              name="nome"
-              placeholder="Jonas Judas Josias"
-              value={cadastro.nome}
-              onChange={handleCadastroChange}
-            />
-
-            <label>Inserir email:</label>
-
-            <input
-              type="email"
-              name="email"
-              placeholder="JJJ@gmail.com"
-              value={cadastro.email}
-              onChange={handleCadastroChange}
-            />
-
-            <label>Crie uma senha:</label>
-
-            <input
-              type="password"
-              name="senha"
-              placeholder="**********"
-              value={cadastro.senha}
-              onChange={handleCadastroChange}
-            />
-
-            <div className="buttons">
-
-              <button
-                className="btn-clear"
-                onClick={limparCadastro}
-                type="button"
-                >
-                limpar
-              </button>
-
-              <button
-                className="btn-enter"
-                onClick={cadastrarUsuario}
-                type="button"
-                disabled={carregando}
-                >
-                {carregando ? "Cadastrando..." : "Cadastrar"}
-              </button>
+        <button className="sair-btn">
+          ⮐ Sair
+        </button>
 
             </div>
 
@@ -396,49 +83,48 @@ async function fazerLoginCliente() {
       </div>
 
       {/* LADO DIREITO */}
-      <div className="right-side">
+      <div className="login-right">
 
-        <div className="box">
+        <div className="image-box">
+
           <img
-            src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85"
+            src="/mesa-redonda.png"
             alt="Mesa"
           />
-        </div>
 
-        <div className="box text-box">
           <p>
             Móveis de madeira:
-            <br />
             O legado da natureza em seu lar.
           </p>
+
         </div>
 
-        <div className="box text-box">
+        <div className="image-box">
+
           <p>
             Durabilidade esculpida,
             conforto garantido.
           </p>
-        </div>
 
-        <div className="box">
           <img
-            src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85"
-            alt="Cama"
+            src="/sofa.png"
+            alt="Sofá"
           />
+
         </div>
 
-        <div className="box">
+        <div className="image-box">
+
           <img
-            src="https://images.unsplash.com/photo-1517705008128-361805f42e86"
-            alt="Madeira"
+            src="/cadeira-madeira.png"
+            alt="Cadeira"
           />
-        </div>
 
-        <div className="box text-box">
           <p>
             Cada peça,
             uma obra-prima da natureza.
           </p>
+
         </div>
 
       </div>
@@ -447,4 +133,4 @@ async function fazerLoginCliente() {
   );
 }
 
-export default LoginPage;
+export default Login;
