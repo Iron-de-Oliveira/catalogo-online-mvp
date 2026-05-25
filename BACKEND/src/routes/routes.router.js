@@ -35,9 +35,11 @@ routes.use('/auth', authRoutes)
 routes.post('/administradores',auth, administradorController.criar)
 
 // Rotas para produtos
-routes.get('/produtos', produtoController.listar)
 routes.get('/produtos/id/:id', produtoController.listarPorId)
-routes.get('/produtos/categoria/:categoria', auth, produtoController.listarPorCategoria)
+routes.get('/produtos/categoria/:categoria', produtoController.listarPorCategoria)
+
+routes.get('/produtos', produtoController.listar)
+
 routes.put('/produtos/id/:id', auth, produtoController.atualizar)
 routes.post('/produtos', upload.single('foto'), produtoController.criar)
 routes.delete('/produtos/id/:id', produtoController.deletar)
