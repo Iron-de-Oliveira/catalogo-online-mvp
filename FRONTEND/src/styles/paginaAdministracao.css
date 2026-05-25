@@ -414,12 +414,14 @@
 }
 
 .admin-carousel::-webkit-scrollbar {
-  height: 8px;
+  background-color: #9dc9d8;
+  height: 14px;
 }
 
 .admin-carousel::-webkit-scrollbar-thumb {
-  background: #00384a;
-  border-radius: 20px;
+  border: solid black 0.5px;
+  background: #cad0e8;
+  border-radius: 2px;
 }
 
 .admin-mini-card {
