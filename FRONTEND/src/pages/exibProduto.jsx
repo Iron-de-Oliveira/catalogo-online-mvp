@@ -10,6 +10,8 @@ export default function ExibProduto() {
 
   const { id } = useParams();
 
+  const [zoomAtivo, setZoomAtivo] = useState(false);
+
   const [produto, setProduto] = useState(null);
 
   const [relacionados, setRelacionados] = useState([]);
@@ -104,6 +106,22 @@ export default function ExibProduto() {
     );
   }
 
+  function compartilharProduto() {
+    const link = window.location.href;
+
+    if (navigator.share) {
+      navigator.share({
+        title: produto.nome,
+        text: `Confira este produto: ${produto.nome}`,
+        url: link
+      });
+    } else {
+      navigator.clipboard.writeText(link);
+
+      alert("Link do produto copiado!");
+    }
+  }
+
   return (
     <div className="showcase-container">
 
@@ -125,12 +143,10 @@ export default function ExibProduto() {
         <div className="product-image">
 
           <img
-            src={
-              produto.foto
-                ? `${baseURL}${produto.foto}`
-                : "/placeholder.png"
-            }
+            src={produto.foto ? `${baseURL}${produto.foto}` : "/placeholder.png"}
             alt={produto.nome}
+            className="main-product-image"
+            onClick={() => setZoomAtivo(true)}
           />
 
         </div>
@@ -168,7 +184,13 @@ export default function ExibProduto() {
               </p>
 
               <button className="whatsapp-btn">
-                ☎
+                <img src="../public/whatsapp.png" />
+              </button>
+              <button
+                className="share-btn"
+                onClick={compartilharProduto}
+              >
+                Compartilhar produto
               </button>
 
             </div>
@@ -188,11 +210,10 @@ export default function ExibProduto() {
             </div>
 
             <div
-              className={`stock ${
-                estoqueIndisponivel
-                  ? "unavailable"
-                  : ""
-              }`}
+              className={`stock ${estoqueIndisponivel
+                ? "unavailable"
+                : ""
+                }`}
             >
 
               <strong>
@@ -243,7 +264,6 @@ export default function ExibProduto() {
                 className="product-card"
                 key={item.id}
               >
-
                 <img
                   src={
                     item.foto
@@ -251,6 +271,8 @@ export default function ExibProduto() {
                       : "/placeholder.png"
                   }
                   alt={item.nome}
+                  className="related-clickable-image"
+                  onClick={() => irParaProduto(item.id)}
                 />
 
                 <p className="product-name">
@@ -279,6 +301,24 @@ export default function ExibProduto() {
         </div>
 
       </section>
+      {/* MODAL ZOOM */}
+
+      {zoomAtivo && (
+        <div
+          className="zoom-overlay"
+          onClick={() => setZoomAtivo(false)}
+        >
+          <img
+            src={
+              produto.foto
+                ? `${baseURL}${produto.foto}`
+                : "/placeholder.png"
+            }
+            alt={produto.nome}
+            className="zoom-image"
+          />
+        </div>
+      )}
 
     </div>
   );

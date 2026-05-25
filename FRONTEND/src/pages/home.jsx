@@ -192,7 +192,7 @@ function Home() {
     <div className="home-container">
       <header className="header">
         <div className="logo">
-          <img src="../public/image.png" alt="Arte em móveis" />
+          <img src="../public/logo.png" alt="Arte em móveis" />
           <h2>Arte em móveis</h2>
         </div>
 
@@ -315,6 +315,8 @@ function Home() {
                     : "/placeholder.png"
                 }
                 alt={produto.nome}
+                onClick={() => irParaProduto(produto.id)}
+                className="clickable-product"
               />
 
               <div>

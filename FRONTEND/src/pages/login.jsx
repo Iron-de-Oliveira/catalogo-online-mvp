@@ -423,6 +423,7 @@ function LoginPage() {
         )}
 
         <div className="footer">
+          <img src="../public/logo.png" alt="" />
           <h3>ARTE EM MÓVEIS</h3>
           <p>Powered by decor&arte</p>
         </div>
