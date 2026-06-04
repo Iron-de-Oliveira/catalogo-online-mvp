@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api, { baseURL } from "../services/server";
 
+
 function Home() {
   const navigate = useNavigate();
 
@@ -192,7 +193,7 @@ function Home() {
     <div className="home-container">
       <header className="header">
         <div className="logo">
-          <img src="../public/logo.png" alt="Arte em móveis" />
+          <img src="/logo.png" alt="Arte em móveis" />
           <h2>Arte em móveis</h2>
         </div>
 

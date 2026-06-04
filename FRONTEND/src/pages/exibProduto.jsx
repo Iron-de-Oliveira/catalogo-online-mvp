@@ -1,6 +1,5 @@
 ﻿import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-
 import api, { baseURL } from "../services/server";
 
 import "../styles/exibProduto.css";
@@ -184,7 +183,7 @@ export default function ExibProduto() {
               </p>
 
               <button className="whatsapp-btn">
-                <img src="../public/whatsapp.png" />
+                <img src="/whatsapp.png" alt="WhatsApp" />
               </button>
               <button
                 className="share-btn"

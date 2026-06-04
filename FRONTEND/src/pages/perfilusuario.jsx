@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/server";
-import "../styles/perfilUsuario.css";
+import "../styles/perfilusuario.css";
 
 function PerfilUsuario() {
   const navigate = useNavigate();

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../services/server";
 import "../styles/login.css";
 
+
 function LoginPage() {
   const navigate = useNavigate();
 
@@ -423,7 +424,7 @@ function LoginPage() {
         )}
 
         <div className="footer">
-          <img src="../public/logo.png" alt="" />
+          <img src="/logo.png" alt="" />
           <h3>ARTE EM MÓVEIS</h3>
           <p>Powered by decor&arte</p>
         </div>
