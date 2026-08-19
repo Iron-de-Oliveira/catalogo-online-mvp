@@ -432,11 +432,7 @@ export default function PaginaAdministracao() {
                 {produtosFiltrados.map((produto) => (
                   <div className="admin-mini-card" key={produto.id}>
                     <img
-                      src={
-                        produto.foto
-                          ? `${api.defaults.baseURL}${produto.foto}`
-                          : "/placeholder.png"
-                      }
+                      src={produto.foto || "/placeholder.png"}
                       alt={produto.nome}
                     />
 
@@ -464,12 +460,8 @@ export default function PaginaAdministracao() {
           <>
             <div className="selected-product-box">
               <img
-                src={
-                  produtoSelecionado.foto
-                    ? `${api.defaults.baseURL}${produtoSelecionado.foto}`
-                    : "/placeholder.png"
-                }
-                alt={produtoSelecionado.nome}
+                src={produto.foto || "/placeholder.png"}
+                alt={produto.nome}
               />
 
               <div className="selected-info">
@@ -557,12 +549,8 @@ export default function PaginaAdministracao() {
         {modo === "deletar" && produtoSelecionado && (
           <div className="delete-confirm-box">
             <img
-              src={
-                produtoSelecionado.foto
-                  ? `${api.defaults.baseURL}${produtoSelecionado.foto}`
-                  : "/placeholder.png"
-              }
-              alt={produtoSelecionado.nome}
+              src={produto.foto || "/placeholder.png"}
+              alt={produto.nome}
             />
 
             <div className="delete-info">
@@ -597,12 +585,8 @@ export default function PaginaAdministracao() {
           <div className="expanded-product-box">
             <div className="expanded-image">
               <img
-                src={
-                  produtoExpandido.foto
-                    ? `${api.defaults.baseURL}${produtoExpandido.foto}`
-                    : "/placeholder.png"
-                }
-                alt={produtoExpandido.nome}
+                src={produto.foto || "/placeholder.png"}
+                alt={produto.nome}
               />
             </div>
 
@@ -643,11 +627,7 @@ export default function PaginaAdministracao() {
               onClick={() => expandirProduto(produto)}
             >
               <img
-                src={
-                  produto.foto
-                    ? `${api.defaults.baseURL}${produto.foto}`
-                    : "/placeholder.png"
-                }
+                src={produto.foto || "/placeholder.png"}
                 alt={produto.nome}
               />
             </div>

@@ -310,11 +310,7 @@ function Home() {
           produtosFiltrados.map((produto) => (
             <div className="product-card" key={produto.id}>
               <img
-                src={
-                  produto.foto
-                    ? `${baseURL}${produto.foto}`
-                    : "/placeholder.png"
-                }
+                 src={produto.foto || "/placeholder.png"}
                 alt={produto.nome}
                 onClick={() => irParaProduto(produto.id)}
                 className="clickable-product"
