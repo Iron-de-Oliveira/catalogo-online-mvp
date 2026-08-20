@@ -1,4 +1,4 @@
-*{
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -10,93 +10,113 @@ body {
 }
 
 .container {
-  width: 1000px;
-  height: 650px;
-  margin: 30px auto;
+  width: 100vw;
+  min-height: 100vh;
   display: flex;
-  background-color: white;
+  background-color: #fff;
+  overflow: hidden;
 }
 
-/* Lado esquerdo */
+/* LADO ESQUERDO */
 .left-side {
-  width: 50%;
+  width: 55%;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  background-color: #fff;
 }
 
 .left-side h1 {
-  font-size: 48px;
-  margin-bottom: 50px;
-  font-family: serif;
+  font-size: 46px;
+  margin-bottom: 85px;
+  font-family: Georgia, serif;
+  font-weight: 600;
+  text-shadow: 3px 4px 5px rgba(0, 0, 0, 0.35);
 }
 
 .cards {
   display: flex;
-  gap: 20px;
+  gap: 38px;
+  align-items: center;
+  justify-content: center;
 }
 
 .card {
-  width: 150px;
+  width: 225px;
+  height: 255px;
   background-color: white;
-  border-radius: 5px;
+  border-radius: 4px;
   overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45);
 }
 
 .card img {
   width: 100%;
-  height: 180px;
+  height: 210px;
   object-fit: cover;
 }
 
-.btn-login {
+.btn-login,
+.btn-adm {
   width: 100%;
-  padding: 10px;
+  height: 45px;
   border: none;
-  background-color: #002b45;
   color: white;
   cursor: pointer;
+  font-family: Georgia, serif;
+  font-size: 15px;
+}
+
+.btn-login {
+  background-color: #00384a;
 }
 
 .btn-adm {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  background-color: #d99500;
-  color: white;
-  cursor: pointer;
+  background-color: #ffb300;
 }
 
+/* FOOTER */
 .footer {
   position: absolute;
   bottom: 20px;
   text-align: center;
+  font-family: Georgia, serif;
 }
 
 .footer h3 {
-  font-size: 14px;
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 10px;
 }
 
 .footer p {
-  font-size: 12px;
-  color: gray;
+  font-size: 16px;
+  color: #333;
+  font-weight: 600;
 }
 
-/* Lado direito */
+.footer img{
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+}
+
+/* LADO DIREITO */
 .right-side {
-  width: 50%;
-  background-color: #d99500;
+  width: 45%;
+  background-color: #ffb300;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  padding: 15px;
+  grid-template-rows: 240px 240px 240px;
+  gap: 20px 10px;
+  padding: 28px 6px 28px 20px;
+  box-shadow: -12px 0 18px rgba(0, 0, 0, 0.35);
 }
 
 .box {
-  background-color: #d99500;
+  background-color: #ffb300;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -106,73 +126,97 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
 }
 
 .text-box {
   text-align: center;
-  font-size: 28px;
-  font-family: serif;
-  padding: 10px;
+  font-size: 27px;
+  font-family: Georgia, serif;
+  font-weight: 600;
+  color: #00384a;
+  line-height: 1.35;
+  padding: 12px;
+  text-shadow: 2px 3px 4px rgba(0, 0, 0, 0.25);
 }
 
-.form-container{
+/* FORMULÁRIOS */
+.form-container {
   width: 100%;
+  min-height: 360px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.form-container h1{
-  margin-bottom: 40px;
+.form-container h1 {
+  margin-bottom: 45px;
 }
 
-.form-container label{
-  width: 250px;
-  font-size: 22px;
+.form-container label {
+  width: 280px;
+  font-size: 21px;
   margin-top: 10px;
+  margin-bottom: 6px;
+  font-family: Georgia, serif;
 }
 
-.form-container input{
-  width: 250px;
-  padding: 10px;
+.form-container input {
+  width: 280px;
+  padding: 11px;
   border-radius: 5px;
   border: 1px solid #777;
   margin-bottom: 10px;
+  font-size: 15px;
 }
 
-.buttons{
+.buttons {
   display: flex;
-  gap: 10px;
+  gap: 14px;
   margin-top: 15px;
 }
 
-.btn-enter{
+.btn-enter,
+.btn-clear,
+.btn-back {
+  border: none;
+  padding: 11px 24px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: Georgia, serif;
+  font-size: 15px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+}
+
+.btn-enter {
   background: #bdf6ff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
 }
 
-.btn-clear{
+.btn-clear {
   background: #f4d27a;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
 }
 
-.btn-back{
+.btn-back {
   margin-top: 20px;
   background: #f8a9b7;
-  border: none;
-  padding: 10px 25px;
-  border-radius: 5px;
-  cursor: pointer;
 }
 
-.register{
+.register {
   margin-top: 20px;
-  font-size: 25px;
+  font-size: 24px;
   cursor: pointer;
+  font-family: Georgia, serif;
+  color: #00384a;
+}
+
+.success-message {
+  margin-top: 15px;
+  color: #15803d;
+  font-weight: bold;
+}
+
+.error-message {
+  margin-top: 15px;
+  color: #dc2626;
+  font-weight: bold;
 }

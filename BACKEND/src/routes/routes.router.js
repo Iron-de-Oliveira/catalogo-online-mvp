@@ -16,23 +16,11 @@ routes.get('/', (req, res) => {
   })
 })
 
-// Rota para upload de imagens
-routes.post('/upload', upload.single('foto'), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: 'Nenhum arquivo foi enviado' })
-  }
-
-  return res.status(200).json({
-    message: 'Arquivo enviado com sucesso',
-    filename: req.file.filename,
-    url: `/uploads/${req.file.filename}`
-  })
-})
-
 // Rotas para autenticação
 routes.use('/auth', authRoutes)
 
 // Rotas para administradores
+<<<<<<< HEAD
 routes.post('/admin/login', administradorController.login)
 routes.post('/administradores', administradorController.criar)
 
@@ -55,5 +43,84 @@ routes.get('/usuarios/id/:id', auth, userController.encontrarPorId)
 routes.get('/usuarios/email/:email', auth, userController.encontrarPorEmail)
 routes.delete('/usuarios/email/:email', auth, userController.deletarPorEmail)
 routes.put('/usuarios/email/:email', auth, userController.atualizarPorEmail)
+=======
+routes.post(
+  '/administradores',
+  auth,
+  administradorController.criar
+)
+
+// Rotas para produtos
+routes.get(
+  '/produtos/id/:id',
+  produtoController.listarPorId
+)
+
+routes.get(
+  '/produtos/categoria/:categoria',
+  produtoController.listarPorCategoria
+)
+
+routes.get(
+  '/produtos',
+  produtoController.listar
+)
+
+// Atualizar produto
+routes.put(
+  '/produtos/id/:id',
+  auth,
+  upload.single('foto'),
+  produtoController.atualizar
+)
+
+// Criar produto
+routes.post(
+  '/produtos',
+  upload.single('foto'),
+  produtoController.criar
+)
+
+// Deletar produto
+routes.delete(
+  '/produtos/id/:id',
+  produtoController.deletar
+)
+
+// Rotas para usuários
+routes.post(
+  '/usuarios',
+  userController.criar
+)
+
+routes.get(
+  '/usuarios',
+  userController.listar
+)
+
+routes.get(
+  '/usuarios/id/:id',
+  auth,
+  userController.encontrarPorId
+)
+
+routes.get(
+  '/usuarios/email/:email',
+  auth,
+  userController.encontrarPorEmail
+)
+
+routes.delete(
+  '/usuarios/email/:email',
+  auth,
+  userController.deletarPorEmail
+)
+
+routes.put(
+  '/usuarios/email/:email',
+  auth,
+  userController.atualizarPorEmail
+)
+>>>>>>> cf48f08b687952a03a5c64a8ebde58c86970187e
 
 module.exports = routes

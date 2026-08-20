@@ -11,6 +11,7 @@ export default function PaginaAdministracao() {
   const [busca, setBusca] = useState("");
   const [categoriaFiltro, setCategoriaFiltro] = useState("");
   const [produtoSelecionado, setProdutoSelecionado] = useState(null);
+  const [produtoExpandido, setProdutoExpandido] = useState(null);
 
   const [imagem, setImagem] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -42,13 +43,13 @@ export default function PaginaAdministracao() {
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    const administrador = localStorage.getItem('administrador')
+    const token = localStorage.getItem("token");
+    const administrador = localStorage.getItem("administrador");
 
     if (!token || !administrador) {
-      navigate('/login')
+      navigate("/login");
     }
-  }, [navigate])
+  }, [navigate]);
 
   async function carregarProdutos() {
     try {
@@ -62,6 +63,7 @@ export default function PaginaAdministracao() {
   function mudarModo(novoModo) {
     setModo(novoModo);
     setProdutoSelecionado(null);
+    setProdutoExpandido(null);
     setMensagem("");
     limparFormulario();
   }
@@ -107,6 +109,7 @@ export default function PaginaAdministracao() {
 
   function preencherFormulario(produto) {
     setProdutoSelecionado(produto);
+    setProdutoExpandido(null);
 
     setFormData({
       nome: produto.nome || "",
@@ -121,10 +124,21 @@ export default function PaginaAdministracao() {
     setPreview(produto.foto ? `${api.defaults.baseURL}${produto.foto}` : null);
   }
 
+  function expandirProduto(produto) {
+    setProdutoExpandido(produto);
+    setProdutoSelecionado(null);
+  }
+
   async function criarProduto(e) {
     e.preventDefault();
 
-    if (!formData.nome || !formData.categoria || !formData.estoque || !formData.preco || !imagem) {
+    if (
+      !formData.nome ||
+      !formData.categoria ||
+      !formData.estoque ||
+      !formData.preco ||
+      !imagem
+    ) {
       setMensagem("Preencha todos os campos obrigatórios e selecione uma imagem.");
       return;
     }
@@ -248,6 +262,7 @@ export default function PaginaAdministracao() {
   function sair() {
     localStorage.removeItem("token");
     localStorage.removeItem("usuario");
+    localStorage.removeItem("administrador");
     navigate("/login");
   }
 
@@ -256,6 +271,7 @@ export default function PaginaAdministracao() {
 
     const correspondeBusca =
       produto.nome?.toLowerCase().includes(buscaNormalizada) ||
+      produto.categoria?.toLowerCase().includes(buscaNormalizada) ||
       String(produto.id).includes(buscaNormalizada);
 
     const correspondeCategoria = categoriaFiltro
@@ -387,6 +403,7 @@ export default function PaginaAdministracao() {
                 <button type="button" className="cancel" onClick={limparFormulario}>
                   Cancelar
                 </button>
+
                 <button type="submit" className="publish" disabled={loading}>
                   {loading ? "Publicando..." : "Publicar"}
                 </button>
@@ -410,33 +427,31 @@ export default function PaginaAdministracao() {
               />
             </div>
 
-            <div className="admin-carousel">
-              {produtosFiltrados.slice(0, 5).map((produto) => (
-                <div className="admin-mini-card" key={produto.id}>
-                  <img
-                    src={
-                      produto.foto
-                        ? `${api.defaults.baseURL}${produto.foto}`
-                        : "/placeholder.png"
-                    }
-                    alt={produto.nome}
-                  />
+            <div className="admin-carousel-wrapper">
+              <div className="admin-carousel">
+                {produtosFiltrados.map((produto) => (
+                  <div className="admin-mini-card" key={produto.id}>
+                    <img
+                      src={produto.foto || "/placeholder.png"}
+                      alt={produto.nome}
+                    />
 
-                  <div className="mini-info">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                    <div className="mini-info">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                      <span></span>
 
-                    <button
-                      className={modo === "atualizar" ? "mini-update" : "mini-delete"}
-                      onClick={() => preencherFormulario(produto)}
-                    >
-                      {modo === "atualizar" ? "Atualizar" : "Deletar"}
-                    </button>
+                      <button
+                        className={modo === "atualizar" ? "mini-update" : "mini-delete"}
+                        onClick={() => preencherFormulario(produto)}
+                      >
+                        {modo === "atualizar" ? "Atualizar" : "Deletar"}
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </>
         )}
@@ -445,12 +460,8 @@ export default function PaginaAdministracao() {
           <>
             <div className="selected-product-box">
               <img
-                src={
-                  produtoSelecionado.foto
-                    ? `${api.defaults.baseURL}${produtoSelecionado.foto}`
-                    : "/placeholder.png"
-                }
-                alt={produtoSelecionado.nome}
+                src={produtos.foto || "/placeholder.png"}
+                alt={produtos.nome}
               />
 
               <div className="selected-info">
@@ -476,7 +487,12 @@ export default function PaginaAdministracao() {
 
               <div className="admin-form-fields">
                 <input name="nome" value={formData.nome} onChange={handleInputChange} />
-                <select name="categoria" value={formData.categoria} onChange={handleInputChange}>
+
+                <select
+                  name="categoria"
+                  value={formData.categoria}
+                  onChange={handleInputChange}
+                >
                   <option value="COZINHA">Cozinha</option>
                   <option value="SALA">Sala</option>
                   <option value="QUARTO">Quarto</option>
@@ -485,21 +501,44 @@ export default function PaginaAdministracao() {
                   <option value="PECAS">Peças</option>
                   <option value="RUSTICO">Rústico</option>
                 </select>
-                <input name="estoque" type="number" value={formData.estoque} onChange={handleInputChange} />
-                <input name="preco" type="number" value={formData.preco} onChange={handleInputChange} />
-                <input name="promocao" value={formData.promocao} onChange={handleInputChange} />
+
+                <input
+                  name="estoque"
+                  type="number"
+                  value={formData.estoque}
+                  onChange={handleInputChange}
+                />
+
+                <input
+                  name="preco"
+                  type="number"
+                  value={formData.preco}
+                  onChange={handleInputChange}
+                />
+
+                <input
+                  name="promocao"
+                  value={formData.promocao}
+                  onChange={handleInputChange}
+                />
               </div>
 
               <div className="admin-description">
                 <label>Editar Descrição do produto:</label>
-                <textarea name="descricao" value={formData.descricao} onChange={handleInputChange} />
+
+                <textarea
+                  name="descricao"
+                  value={formData.descricao}
+                  onChange={handleInputChange}
+                />
 
                 <div className="admin-form-buttons">
                   <button type="button" className="cancel" onClick={limparFormulario}>
                     Cancelar
                   </button>
-                  <button type="submit" className="publish">
-                    Atualizar
+
+                  <button type="submit" className="publish" disabled={loading}>
+                    {loading ? "Atualizando..." : "Atualizar"}
                   </button>
                 </div>
               </div>
@@ -510,11 +549,7 @@ export default function PaginaAdministracao() {
         {modo === "deletar" && produtoSelecionado && (
           <div className="delete-confirm-box">
             <img
-              src={
-                produtoSelecionado.foto
-                  ? `${api.defaults.baseURL}${produtoSelecionado.foto}`
-                  : "/placeholder.png"
-              }
+              src={produtoSelecionado.foto || "/placeholder.png"}
               alt={produtoSelecionado.nome}
             />
 
@@ -527,26 +562,72 @@ export default function PaginaAdministracao() {
               <p>Preço: R$ {Number(produtoSelecionado.preco).toFixed(2)}</p>
 
               <div>
-                <button className="cancel-small" onClick={() => setProdutoSelecionado(null)}>
+                <button
+                  className="cancel-small"
+                  onClick={() => setProdutoSelecionado(null)}
+                >
                   Cancelar
                 </button>
-                <button className="delete-small" onClick={deletarProduto}>
-                  Deletar
+
+                <button
+                  className="delete-small"
+                  onClick={deletarProduto}
+                  disabled={loading}
+                >
+                  {loading ? "Deletando..." : "Deletar"}
                 </button>
               </div>
             </div>
           </div>
         )}
 
+        {produtoExpandido && (
+          <div className="expanded-product-box">
+            <div className="expanded-image">
+              <img
+                src={produtoExpandido.foto || "/placeholder.png"}
+                alt={produtoExpandido.nome}
+              />
+            </div>
+
+            <div className="expanded-info">
+              <h2>{produtoExpandido.nome}</h2>
+
+              <p>
+                <strong>Categoria:</strong> {produtoExpandido.categoria}
+              </p>
+
+              <p>
+                <strong>Estoque:</strong> {produtoExpandido.estoque}
+              </p>
+
+              <p>
+                <strong>Preço:</strong> R$ {Number(produtoExpandido.preco).toFixed(2)}
+              </p>
+
+              <div className="expanded-description">
+                {produtoExpandido.descricao || "Produto sem descrição cadastrada."}
+              </div>
+
+              <button
+                className="expanded-close"
+                onClick={() => setProdutoExpandido(null)}
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        )}
+
         <section className="admin-products-grid">
           {produtosFiltrados.map((produto) => (
-            <div className="admin-product-card" key={produto.id}>
+            <div
+              className="admin-product-card"
+              key={produto.id}
+              onClick={() => expandirProduto(produto)}
+            >
               <img
-                src={
-                  produto.foto
-                    ? `${api.defaults.baseURL}${produto.foto}`
-                    : "/placeholder.png"
-                }
+                src={produto.foto || "/placeholder.png"}
                 alt={produto.nome}
               />
             </div>

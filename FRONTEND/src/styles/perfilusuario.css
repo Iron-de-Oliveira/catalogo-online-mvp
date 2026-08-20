@@ -1,0 +1,161 @@
+.perfil-container {
+  min-height: 100vh;
+  background: #ececec;
+  padding: 30px;
+}
+
+.perfil-topo {
+  background: linear-gradient(to right, #005f8f, #0075ad);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  color: white;
+}
+
+.perfil-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.foto-perfil {
+  width: 80px;
+  height: 80px;
+  background: white;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 40px;
+}
+
+.nome-usuario {
+  padding: 8px;
+  border-radius: 5px;
+  border: none;
+}
+
+.btn-atualizar {
+  background: #f7b84b;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.dados-container {
+  margin-top: 30px;
+}
+
+.dado {
+  width: 350px;
+  background: white;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.formulario-edicao {
+  margin-top: 40px;
+  width: 700px;
+  background: #005f8f;
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.form-content {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.inputs input {
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+}
+
+.foto-upload {
+  display: flex;
+  flex-direction: column;
+}
+
+.botoes {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn-cancelar {
+  background: #ff5d5d;
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-cancelar:disabled,
+.btn-atualizar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.success-message {
+  color: #27ae60;
+  background-color: #d5f4e6;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border: 1px solid #27ae60;
+  font-size: 16px;
+  text-align: center;
+}
+
+.error-message {
+  color: #c0392b;
+  background-color: #fadbd8;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border: 1px solid #c0392b;
+  font-size: 16px;
+  text-align: center;
+}
+
+.back-home {
+  position: absolute;
+  left: 25px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  background: transparent !important;
+  border: none !important;
+  color: #000;
+
+  font-size: 58px;
+  font-weight: bold;
+  line-height: 1;
+
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+
+  user-select: none;
+}
+
+.back-home:hover {
+  transform: translateY(-50%) scale(1.08);
+}

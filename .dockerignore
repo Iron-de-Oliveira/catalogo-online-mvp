@@ -1,0 +1,5 @@
+.git
+node_modules
+.env
+BACKEND/node_modules
+FRONTEND/node_modules
