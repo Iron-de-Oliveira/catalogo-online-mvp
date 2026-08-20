@@ -460,8 +460,8 @@ export default function PaginaAdministracao() {
           <>
             <div className="selected-product-box">
               <img
-                src={produto.foto || "/placeholder.png"}
-                alt={produto.nome}
+                src={produtos.foto || "/placeholder.png"}
+                alt={produtos.nome}
               />
 
               <div className="selected-info">
@@ -549,8 +549,8 @@ export default function PaginaAdministracao() {
         {modo === "deletar" && produtoSelecionado && (
           <div className="delete-confirm-box">
             <img
-              src={produto.foto || "/placeholder.png"}
-              alt={produto.nome}
+              src={produtos.foto || "/placeholder.png"}
+              alt={produtos.nome}
             />
 
             <div className="delete-info">
@@ -585,8 +585,8 @@ export default function PaginaAdministracao() {
           <div className="expanded-product-box">
             <div className="expanded-image">
               <img
-                src={produto.foto || "/placeholder.png"}
-                alt={produto.nome}
+                src={produtos.foto || "/placeholder.png"}
+                alt={produtos.nome}
               />
             </div>
 
