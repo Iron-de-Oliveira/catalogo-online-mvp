@@ -1,19 +1,26 @@
 .perfil-container {
+  width: 100%;
   min-height: 100vh;
+  min-height: 100svh;
   background: #ececec;
-  padding: 30px;
+  padding: clamp(14px, 4vw, 30px);
+  overflow-x: hidden;
 }
 
 .perfil-topo {
+  position: relative;
   background: linear-gradient(to right, #005f8f, #0075ad);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
+  gap: 24px;
+  padding: 20px 24px 20px 80px;
   color: white;
+  border-radius: 8px;
 }
 
 .perfil-info {
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 15px;
@@ -22,6 +29,7 @@
 .foto-perfil {
   width: 80px;
   height: 80px;
+  flex: 0 0 80px;
   background: white;
   border-radius: 10px;
   display: flex;
@@ -31,69 +39,102 @@
 }
 
 .nome-usuario {
+  width: min(300px, 100%);
+  min-width: 0;
   padding: 8px;
   border-radius: 5px;
   border: none;
 }
 
+.perfil-acoes {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: right;
+}
+
+.perfil-acoes p {
+  overflow-wrap: anywhere;
+}
+
 .btn-atualizar {
   background: #f7b84b;
+  color: #111;
   border: none;
   padding: 10px 25px;
+  min-height: 42px;
   border-radius: 8px;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .dados-container {
   margin-top: 30px;
 }
 
+.dados-container h1 {
+  font-size: clamp(24px, 4vw, 32px);
+  margin-bottom: 16px;
+}
+
 .dado {
-  width: 350px;
+  width: min(100%, 520px);
   background: white;
   padding: 15px;
   margin-bottom: 10px;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .1);
+  overflow-wrap: anywhere;
 }
 
 .formulario-edicao {
   margin-top: 40px;
-  width: 700px;
+  width: min(100%, 700px);
   background: #005f8f;
   color: white;
   padding: 20px;
   border-radius: 10px;
 }
 
+.formulario-edicao h3 {
+  line-height: 1.3;
+  margin-bottom: 18px;
+}
+
 .form-content {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, .8fr);
   justify-content: space-between;
   gap: 20px;
 }
 
 .inputs {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  flex: 1;
 }
 
 .inputs input {
+  width: 100%;
+  min-height: 42px;
   padding: 10px;
   border-radius: 6px;
   border: none;
 }
 
 .foto-upload {
+  min-width: 0;
   display: flex;
   flex-direction: column;
+  gap: 8px;
 }
 
 .botoes {
   display: flex;
   gap: 10px;
   margin-top: 20px;
+  flex-wrap: wrap;
 }
 
 .btn-cancelar {
@@ -101,38 +142,39 @@
   color: white;
   border: none;
   padding: 10px 25px;
+  min-height: 42px;
   border-radius: 8px;
   cursor: pointer;
 }
 
 .btn-cancelar:disabled,
 .btn-atualizar:disabled {
-  opacity: 0.6;
+  opacity: .6;
   cursor: not-allowed;
+}
+
+.success-message,
+.error-message {
+  width: 100%;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  text-align: center;
+  overflow-wrap: anywhere;
 }
 
 .success-message {
   color: #27ae60;
   background-color: #d5f4e6;
-  padding: 15px;
-  border-radius: 8px;
-  margin-top: 20px;
-  margin-bottom: 20px;
   border: 1px solid #27ae60;
-  font-size: 16px;
-  text-align: center;
 }
 
 .error-message {
   color: #c0392b;
   background-color: #fadbd8;
-  padding: 15px;
-  border-radius: 8px;
-  margin-top: 20px;
-  margin-bottom: 20px;
   border: 1px solid #c0392b;
-  font-size: 16px;
-  text-align: center;
 }
 
 .back-home {
@@ -140,22 +182,100 @@
   left: 25px;
   top: 50%;
   transform: translateY(-50%);
-
   background: transparent !important;
   border: none !important;
   color: #000;
-
   font-size: 58px;
   font-weight: bold;
   line-height: 1;
-
   cursor: pointer;
   padding: 0;
   margin: 0;
-
   user-select: none;
 }
 
 .back-home:hover {
   transform: translateY(-50%) scale(1.08);
+}
+
+@media (max-width: 760px) {
+  .perfil-topo {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 70px 18px 18px;
+    gap: 18px;
+  }
+
+  .perfil-info {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .nome-usuario {
+    flex: 1 1 180px;
+  }
+
+  .perfil-acoes {
+    justify-content: center;
+    flex-wrap: wrap;
+    text-align: center;
+  }
+
+  .back-home {
+    left: 18px;
+    top: 18px;
+    transform: none;
+    color: white;
+    font-size: 44px;
+  }
+
+  .back-home:hover {
+    transform: scale(1.08);
+  }
+
+  .form-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .perfil-container {
+    padding: 10px;
+  }
+
+  .perfil-topo {
+    padding: 62px 14px 16px;
+  }
+
+  .foto-perfil {
+    width: 68px;
+    height: 68px;
+    flex-basis: 68px;
+    font-size: 34px;
+  }
+
+  .perfil-info {
+    gap: 10px;
+  }
+
+  .perfil-acoes {
+    flex-direction: column;
+  }
+
+  .perfil-acoes .btn-atualizar {
+    width: 100%;
+  }
+
+  .formulario-edicao {
+    padding: 14px;
+    margin-top: 24px;
+  }
+
+  .botoes {
+    flex-direction: column;
+  }
+
+  .botoes button {
+    width: 100%;
+  }
 }
