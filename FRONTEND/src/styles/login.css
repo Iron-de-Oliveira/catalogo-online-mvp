@@ -10,46 +10,56 @@ body {
 }
 
 .container {
-  width: 100vw;
+  width: 100%;
   min-height: 100vh;
+  min-height: 100svh;
   display: flex;
   background-color: #fff;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 /* LADO ESQUERDO */
 .left-side {
   width: 55%;
+  min-width: 0;
+  min-height: 100vh;
+  min-height: 100svh;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   background-color: #fff;
+  padding: 40px 24px 120px;
 }
 
 .left-side h1 {
-  font-size: 46px;
-  margin-bottom: 85px;
+  font-size: clamp(32px, 4vw, 46px);
+  margin-bottom: clamp(40px, 7vh, 85px);
   font-family: Georgia, serif;
   font-weight: 600;
-  text-shadow: 3px 4px 5px rgba(0, 0, 0, 0.35);
+  text-align: center;
+  line-height: 1.1;
+  text-shadow: 3px 4px 5px rgba(0, 0, 0, .35);
 }
 
 .cards {
+  width: 100%;
   display: flex;
   gap: 38px;
   align-items: center;
   justify-content: center;
+  position: relative;
+  z-index: 1;
 }
 
 .card {
-  width: 225px;
+  width: min(225px, 42%);
   height: 255px;
   background-color: white;
   border-radius: 4px;
   overflow: hidden;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, .45);
 }
 
 .card img {
@@ -67,6 +77,9 @@ body {
   cursor: pointer;
   font-family: Georgia, serif;
   font-size: 15px;
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
 }
 
 .btn-login {
@@ -81,6 +94,8 @@ body {
 .footer {
   position: absolute;
   bottom: 20px;
+  left: 20px;
+  right: 20px;
   text-align: center;
   font-family: Georgia, serif;
 }
@@ -97,25 +112,28 @@ body {
   font-weight: 600;
 }
 
-.footer img{
+.footer img {
   width: 60px;
   height: 60px;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 /* LADO DIREITO */
 .right-side {
   width: 45%;
+  min-width: 0;
   background-color: #ffb300;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 240px 240px 240px;
+  grid-template-rows: repeat(3, minmax(180px, 1fr));
   gap: 20px 10px;
   padding: 28px 6px 28px 20px;
-  box-shadow: -12px 0 18px rgba(0, 0, 0, 0.35);
+  box-shadow: -12px 0 18px rgba(0, 0, 0, .35);
 }
 
 .box {
+  min-width: 0;
+  min-height: 0;
   background-color: #ffb300;
   display: flex;
   align-items: center;
@@ -126,23 +144,23 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .45);
 }
 
 .text-box {
   text-align: center;
-  font-size: 27px;
+  font-size: clamp(20px, 2.2vw, 27px);
   font-family: Georgia, serif;
   font-weight: 600;
   color: #00384a;
   line-height: 1.35;
   padding: 12px;
-  text-shadow: 2px 3px 4px rgba(0, 0, 0, 0.25);
+  text-shadow: 2px 3px 4px rgba(0, 0, 0, .25);
 }
 
 /* FORMULÁRIOS */
 .form-container {
-  width: 100%;
+  width: min(100%, 360px);
   min-height: 360px;
   display: flex;
   flex-direction: column;
@@ -151,10 +169,11 @@ body {
 
 .form-container h1 {
   margin-bottom: 45px;
+  text-align: center;
 }
 
 .form-container label {
-  width: 280px;
+  width: 100%;
   font-size: 21px;
   margin-top: 10px;
   margin-bottom: 6px;
@@ -162,7 +181,8 @@ body {
 }
 
 .form-container input {
-  width: 280px;
+  width: 100%;
+  min-height: 44px;
   padding: 11px;
   border-radius: 5px;
   border: 1px solid #777;
@@ -173,6 +193,8 @@ body {
 .buttons {
   display: flex;
   gap: 14px;
+  width: 100%;
+  justify-content: center;
   margin-top: 15px;
 }
 
@@ -181,11 +203,12 @@ body {
 .btn-back {
   border: none;
   padding: 11px 24px;
+  min-height: 44px;
   border-radius: 5px;
   cursor: pointer;
   font-family: Georgia, serif;
   font-size: 15px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .25);
 }
 
 .btn-enter {
@@ -207,16 +230,143 @@ body {
   cursor: pointer;
   font-family: Georgia, serif;
   color: #00384a;
+  text-align: center;
+}
+
+.success-message,
+.error-message {
+  margin-top: 15px;
+  text-align: center;
+  overflow-wrap: anywhere;
 }
 
 .success-message {
-  margin-top: 15px;
   color: #15803d;
   font-weight: bold;
 }
 
 .error-message {
-  margin-top: 15px;
   color: #dc2626;
   font-weight: bold;
+}
+
+@media (max-width: 1050px) {
+  .left-side {
+    padding-inline: 20px;
+  }
+
+  .cards {
+    gap: 18px;
+  }
+
+  .right-side {
+    gap: 12px 8px;
+    padding-left: 12px;
+  }
+}
+
+@media (max-width: 820px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .box, .text-box, .right-side {
+    display: none;
+  }
+
+  .footer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .left-side,
+  .right-side {
+    width: 100%;
+  }
+
+  .left-side {
+    min-height: 100svh;
+    justify-content: flex-start;
+    padding: 42px 20px 115px;
+  }
+
+  .footer {
+    position: static;
+    margin-top: auto;
+  }
+
+  .left-side h1 {
+    margin-bottom: 35px;
+  }
+
+  .cards {
+    max-width: 620px;
+  }
+
+}
+
+@media (max-width: 560px) {
+  .left-side {
+    padding: 30px 16px 105px;
+  }
+
+  .left-side h1 {
+    font-size: 34px;
+    margin-bottom: 30px;
+  }
+
+  .cards {
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .card {
+    width: min(280px, 92vw);
+    height: auto;
+  }
+
+  .card img {
+    height: 220px;
+  }
+
+  .form-container {
+    width: min(100%, 360px);
+  }
+
+  .form-container label {
+    font-size: 18px;
+  }
+
+  .buttons {
+    gap: 10px;
+  }
+
+  .btn-enter,
+  .btn-clear,
+  .btn-back {
+    padding-inline: 18px;
+  }
+
+  .register {
+    font-size: 21px;
+  }
+
+}
+
+@media (max-width: 360px) {
+  .left-side h1 {
+    font-size: 30px;
+  }
+
+  .form-container input {
+    font-size: 14px;
+  }
+
+  .buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }

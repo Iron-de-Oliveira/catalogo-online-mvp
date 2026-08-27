@@ -210,6 +210,7 @@ function LoginPage() {
 
                 <button
                   className="btn-login"
+                  type="button"
                   onClick={() => setTela("cliente")}
                 >
                   Fazer login
@@ -224,6 +225,7 @@ function LoginPage() {
 
                 <button
                   className="btn-adm"
+                  type="button"
                   onClick={() => setTela("adm")}
                 >
                   Acessar como ADM
