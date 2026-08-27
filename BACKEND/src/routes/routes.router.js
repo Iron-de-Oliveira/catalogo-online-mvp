@@ -26,22 +26,10 @@ routes.post(
 )
 
 // Rotas para produtos
-routes.get(
-  '/produtos/id/:id',
-  produtoController.listarPorId
-)
+routes.get('/produtos/id/:id', produtoController.listarPorId)
+routes.get('/produtos/categoria/:categoria', produtoController.listarPorCategoria)
+routes.get('/produtos', produtoController.listar)
 
-routes.get(
-  '/produtos/categoria/:categoria',
-  produtoController.listarPorCategoria
-)
-
-routes.get(
-  '/produtos',
-  produtoController.listar
-)
-
-// Atualizar produto
 routes.put(
   '/produtos/id/:id',
   auth,
@@ -49,52 +37,15 @@ routes.put(
   produtoController.atualizar
 )
 
-// Criar produto
-routes.post(
-  '/produtos',
-  upload.single('foto'),
-  produtoController.criar
-)
-
-// Deletar produto
-routes.delete(
-  '/produtos/id/:id',
-  produtoController.deletar
-)
+routes.post('/produtos', upload.single('foto'), produtoController.criar)
+routes.delete('/produtos/id/:id', produtoController.deletar)
 
 // Rotas para usuários
-routes.post(
-  '/usuarios',
-  userController.criar
-)
-
-routes.get(
-  '/usuarios',
-  userController.listar
-)
-
-routes.get(
-  '/usuarios/id/:id',
-  auth,
-  userController.encontrarPorId
-)
-
-routes.get(
-  '/usuarios/email/:email',
-  auth,
-  userController.encontrarPorEmail
-)
-
-routes.delete(
-  '/usuarios/email/:email',
-  auth,
-  userController.deletarPorEmail
-)
-
-routes.put(
-  '/usuarios/email/:email',
-  auth,
-  userController.atualizarPorEmail
-)
+routes.post('/usuarios', userController.criar)
+routes.get('/usuarios', userController.listar)
+routes.get('/usuarios/id/:id', auth, userController.encontrarPorId)
+routes.get('/usuarios/email/:email', auth, userController.encontrarPorEmail)
+routes.delete('/usuarios/email/:email', auth, userController.deletarPorEmail)
+routes.put('/usuarios/email/:email', auth, userController.atualizarPorEmail)
 
 module.exports = routes
