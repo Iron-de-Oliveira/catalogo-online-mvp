@@ -5,7 +5,17 @@ const prisma = require('../config/prisma')
 class AuthController {
   async register(req, res) {
     try {
-      const { nome, email, senha } = req.body
+      const { nome, email, senha } = req.body || {}
+
+      const camposObrigatoriosPreenchidos = [nome, email, senha].every(
+        (campo) => typeof campo === 'string' && campo.trim().length > 0
+      )
+
+      if (!camposObrigatoriosPreenchidos) {
+        return res.status(400).json({
+          error: 'Preencha todos os campos obrigatórios.'
+        })
+      }
 
       const usuarioExiste = await prisma.usuario.findUnique({
         where: {
