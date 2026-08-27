@@ -1,172 +1,207 @@
-
 import { useState } from "react";
-import { useNavigate } from 'react-router-dom'
-import "../styles/login.css";
+import { useNavigate } from "react-router-dom";
 import api from "../services/server";
 import "../styles/login.css";
 
 
-
-// função principal de login 
 function LoginPage() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-// ESTADOS PARA GERENCIAR TELAS E FORMULÁRIOS
+  const [tela, setTela] = useState("inicio");
 
-  const [tela, setTela] = useState("inicio")
   const [cadastro, setCadastro] = useState({
-  nome: "",
-  email: "",
-  senha: ""
-});
-
-// MENSAGENS DE SUCESSO E ERRO
-const [mensagem, setMensagem] = useState("");
-const [erro, setErro] = useState("");
-const [carregando, setCarregando] = useState(false);
-
-function handleCadastroChange(event) {
-  const { name, value } = event.target;
-
-  setCadastro({
-    ...cadastro,
-    [name]: value
-  });
-}
-
-function limparCadastro() {
-  setCadastro({
     nome: "",
     email: "",
     senha: ""
   });
 
-  setMensagem("");
-  setErro("");
-}
+  const [loginCliente, setLoginCliente] = useState({
+    email: "",
+    senha: ""
+  });
 
-async function cadastrarUsuario() {
-  try {
-    setCarregando(true);
-    setErro("");
-    setMensagem("");
+  const [loginAdmin, setLoginAdmin] = useState({
+    cpf: "",
+    senha: ""
+  });
 
-    const response = await api.post("/auth/register", cadastro);
+  const [mensagem, setMensagem] = useState("");
+  const [erro, setErro] = useState("");
+  const [carregando, setCarregando] = useState(false);
 
-    setMensagem("Usuário cadastrado com sucesso!");
+  const [mensagemLogin, setMensagemLogin] = useState("");
+  const [erroLogin, setErroLogin] = useState("");
+  const [carregandoLogin, setCarregandoLogin] = useState(false);
 
+  const [mensagemLoginAdmin, setMensagemLoginAdmin] = useState("");
+  const [erroLoginAdmin, setErroLoginAdmin] = useState("");
+  const [carregandoLoginAdmin, setCarregandoLoginAdmin] = useState(false);
+
+  function handleCadastroChange(event) {
+    const { name, value } = event.target;
+
+    setCadastro({
+      ...cadastro,
+      [name]: value
+    });
+  }
+
+  function handleLoginClienteChange(event) {
+    const { name, value } = event.target;
+
+    setLoginCliente({
+      ...loginCliente,
+      [name]: value
+    });
+  }
+
+  function handleLoginAdminChange(event) {
+    const { name, value } = event.target;
+
+    setLoginAdmin({
+      ...loginAdmin,
+      [name]: value
+    });
+  }
+
+  function limparCadastro() {
     setCadastro({
       nome: "",
       email: "",
       senha: ""
     });
 
-    console.log("Usuário criado:", response.data);
-
-    setTimeout(() => {
-      setTela("cliente");
-    }, 1500);
-
-  } catch (error) {
-    console.log(error);
-
-    if (error.response?.data?.error) {
-      setErro(error.response.data.error);
-    } else {
-      setErro("Erro ao cadastrar usuário.");
-    }
-
-  } finally {
-    setCarregando(false);
+    setMensagem("");
+    setErro("");
   }
-}
 
-// ESTADOS PARA LOGIN
-const [loginCliente, setLoginCliente] = useState({
-  email: "",
-  senha: ""
-});
+  function limparLoginCliente() {
+    setLoginCliente({
+      email: "",
+      senha: ""
+    });
 
-const [mensagemLogin, setMensagemLogin] = useState("");
-const [erroLogin, setErroLogin] = useState("");
-const [carregandoLogin, setCarregandoLogin] = useState(false);
-
-// função para lidar com mudanças no formulário de login,
-//  capturar inputs e atualizar o estado loginCliente
-function handleLoginClienteChange(event) {
-  const { name, value } = event.target;
-
-  setLoginCliente({
-    ...loginCliente,
-    [name]: value
-  });
-}
-
-// função para realizar login do cliente, enviar dados para API
-//e lidar com respostas
-async function fazerLoginCliente() {
-  try {
-
-    setCarregandoLogin(true)
-    setErroLogin("")
-    setMensagemLogin("")
-
-    const response = await api.post(
-      "/auth/login",
-      loginCliente
-    )
-
-    console.log("Login realizado:", response.data)
-
-    localStorage.setItem(
-      "token",
-      response.data.token
-    )
-
-    localStorage.setItem(
-      "usuario",
-      JSON.stringify(response.data.usuario)
-    )
-
-    setMensagemLogin("Login realizado com sucesso!")
-
-    localStorage.setItem("token", response.data.token)
-    localStorage.setItem("usuario", JSON.stringify(response.data.usuario))
-
-    navigate('/home')
-
-  } catch (error) {
-
-    console.log(error)
-
-    if (error.response?.data?.error) {
-      setErroLogin(error.response.data.error)
-    } else {
-      setErroLogin("Erro ao realizar login.")
-    }
-
-  } finally {
-    setCarregandoLogin(false)
+    setMensagemLogin("");
+    setErroLogin("");
   }
-}
 
+  function limparLoginAdmin() {
+    setLoginAdmin({
+      cpf: "",
+      senha: ""
+    });
+
+    setMensagemLoginAdmin("");
+    setErroLoginAdmin("");
+  }
+
+  async function cadastrarUsuario() {
+    try {
+      setCarregando(true);
+      setErro("");
+      setMensagem("");
+
+      const response = await api.post("/auth/register", cadastro);
+
+      setMensagem("Usuário cadastrado com sucesso!");
+
+      setCadastro({
+        nome: "",
+        email: "",
+        senha: ""
+      });
+
+      console.log("Usuário criado:", response.data);
+
+      setTimeout(() => {
+        setTela("cliente");
+      }, 1500);
+
+    } catch (error) {
+      console.log(error);
+
+      if (error.response?.data?.error) {
+        setErro(error.response.data.error);
+      } else {
+        setErro("Erro ao cadastrar usuário.");
+      }
+
+    } finally {
+      setCarregando(false);
+    }
+  }
+
+  async function fazerLoginCliente() {
+    try {
+      setCarregandoLogin(true);
+      setErroLogin("");
+      setMensagemLogin("");
+
+      const response = await api.post("/auth/login", loginCliente);
+
+      console.log("Login realizado:", response.data);
+
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("usuario", JSON.stringify(response.data.usuario));
+
+      setMensagemLogin("Login realizado com sucesso!");
+
+      navigate("/");
+
+    } catch (error) {
+      console.log(error);
+
+      if (error.response?.data?.error) {
+        setErroLogin(error.response.data.error);
+      } else {
+        setErroLogin("Erro ao realizar login.");
+      }
+
+    } finally {
+      setCarregandoLogin(false);
+    }
+  }
+
+  async function fazerLoginAdmin() {
+    try {
+      setCarregandoLoginAdmin(true);
+      setErroLoginAdmin("");
+      setMensagemLoginAdmin("");
+
+      const response = await api.post("/auth/login-admin", loginAdmin);
+
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem(
+        "administrador",
+        JSON.stringify(response.data.administrador)
+      );
+
+      setMensagemLoginAdmin("Login do administrador realizado com sucesso!");
+
+      navigate("/admin");
+
+    } catch (error) {
+      console.log(error);
+
+      if (error.response?.data?.error) {
+        setErroLoginAdmin(error.response.data.error);
+      } else {
+        setErroLoginAdmin("Erro ao realizar login do administrador.");
+      }
+
+    } finally {
+      setCarregandoLoginAdmin(false);
+    }
+  }
 
   return (
     <div className="container">
-
-      {/* LADO ESQUERDO */}
       <div className="left-side">
-
-        {/* ========================= */}
-        {/* TELA INICIAL */}
-        {/* ========================= */}
         {tela === "inicio" && (
           <>
             <h1>Seja bem vindo!</h1>
 
             <div className="cards">
-
-              {/* CARD LOGIN */}
               <div className="card">
                 <img
                   src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3"
@@ -181,7 +216,6 @@ async function fazerLoginCliente() {
                 </button>
               </div>
 
-              {/* CARD ADM */}
               <div className="card">
                 <img
                   src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2"
@@ -195,21 +229,15 @@ async function fazerLoginCliente() {
                   Acessar como ADM
                 </button>
               </div>
-
             </div>
           </>
         )}
 
-        {/* ========================= */}
-        {/* TELA CLIENTE */}
-        {/* ========================= */}
         {tela === "cliente" && (
           <div className="form-container">
-
             <h1>Seja bem vindo!</h1>
 
             <label>Inserir email:</label>
-
             <input
               type="email"
               name="email"
@@ -219,7 +247,6 @@ async function fazerLoginCliente() {
             />
 
             <label>Insira senha:</label>
-
             <input
               type="password"
               name="senha"
@@ -229,15 +256,10 @@ async function fazerLoginCliente() {
             />
 
             <div className="buttons">
-
-               <button
+              <button
                 className="btn-clear"
                 type="button"
-                onClick={() => {
-                  setLoginCliente({ email: "", senha: "" });
-                  setMensagemLogin("");
-                  setErroLogin("");
-                }}
+                onClick={limparLoginCliente}
               >
                 limpar
               </button>
@@ -250,7 +272,6 @@ async function fazerLoginCliente() {
               >
                 {carregandoLogin ? "Entrando..." : "Entrar"}
               </button>
-
             </div>
 
             <p
@@ -266,44 +287,65 @@ async function fazerLoginCliente() {
             >
               ⬅ Sair
             </button>
-            {mensagemLogin && <p className="success-message">{mensagemLogin}</p>}
-            {erroLogin && <p className="error-message">{erroLogin}</p>}
+
+            {mensagemLogin && (
+              <p className="success-message">{mensagemLogin}</p>
+            )}
+
+            {erroLogin && (
+              <p className="error-message">{erroLogin}</p>
+            )}
           </div>
         )}
 
-        {/* ========================= */}
-        {/* TELA ADM */}
-        {/* ========================= */}
         {tela === "adm" && (
           <div className="form-container">
-
             <h1>Seja bem vindo!</h1>
 
             <label>Insira CPF:</label>
-
             <input
               type="text"
-              placeholder="000.555.999-88"
+              name="cpf"
+              placeholder="00055599988"
+              value={loginAdmin.cpf}
+              onChange={handleLoginAdminChange}
             />
 
             <label>Insira senha:</label>
-
             <input
               type="password"
+              name="senha"
               placeholder="********"
+              value={loginAdmin.senha}
+              onChange={handleLoginAdminChange}
             />
 
             <div className="buttons">
-
-              <button className="btn-enter">
-                Entrar
+              <button
+                className="btn-enter"
+                type="button"
+                onClick={fazerLoginAdmin}
+                disabled={carregandoLoginAdmin}
+              >
+                {carregandoLoginAdmin ? "Entrando..." : "Entrar"}
               </button>
 
-              <button className="btn-clear">
+              <button
+                className="btn-clear"
+                type="button"
+                onClick={limparLoginAdmin}
+              >
                 limpar
               </button>
-
             </div>
+
+            {mensagemLoginAdmin && (
+              <p className="success-message">{mensagemLoginAdmin}</p>
+            )}
+
+            {erroLoginAdmin && (
+              <p className="error-message">{erroLoginAdmin}</p>
+            )}
 
             <button
               className="btn-back"
@@ -311,20 +353,14 @@ async function fazerLoginCliente() {
             >
               ⬅ Sair
             </button>
-
           </div>
         )}
 
-        {/* ========================= */}
-        {/* TELA CADASTRO */}
-        {/* ========================= */}
         {tela === "cadastro" && (
           <div className="form-container">
-
             <h1>Seja bem vindo!</h1>
 
             <label>Nome:</label>
-
             <input
               type="text"
               name="nome"
@@ -334,7 +370,6 @@ async function fazerLoginCliente() {
             />
 
             <label>Inserir email:</label>
-
             <input
               type="email"
               name="email"
@@ -344,7 +379,6 @@ async function fazerLoginCliente() {
             />
 
             <label>Crie uma senha:</label>
-
             <input
               type="password"
               name="senha"
@@ -354,12 +388,11 @@ async function fazerLoginCliente() {
             />
 
             <div className="buttons">
-
               <button
                 className="btn-clear"
                 onClick={limparCadastro}
                 type="button"
-                >
+              >
                 limpar
               </button>
 
@@ -368,10 +401,9 @@ async function fazerLoginCliente() {
                 onClick={cadastrarUsuario}
                 type="button"
                 disabled={carregando}
-                >
+              >
                 {carregando ? "Cadastrando..." : "Cadastrar"}
               </button>
-
             </div>
 
             <button
@@ -381,23 +413,24 @@ async function fazerLoginCliente() {
               ⬅ Sair
             </button>
 
-            {mensagem && <p className="success-message">{mensagem}</p>}
-            {erro && <p className="error-message">{erro}</p>}
+            {mensagem && (
+              <p className="success-message">{mensagem}</p>
+            )}
 
+            {erro && (
+              <p className="error-message">{erro}</p>
+            )}
           </div>
         )}
 
-        {/* FOOTER */}
         <div className="footer">
+          <img src="/logo.png" alt="" />
           <h3>ARTE EM MÓVEIS</h3>
           <p>Powered by decor&arte</p>
         </div>
-
       </div>
 
-      {/* LADO DIREITO */}
       <div className="right-side">
-
         <div className="box">
           <img
             src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85"
@@ -440,9 +473,7 @@ async function fazerLoginCliente() {
             uma obra-prima da natureza.
           </p>
         </div>
-
       </div>
-
     </div>
   );
 }

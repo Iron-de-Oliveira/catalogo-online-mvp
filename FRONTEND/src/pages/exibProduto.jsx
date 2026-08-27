@@ -1,120 +1,316 @@
-// ProductShowcase.jsx
-import React from "react";
+﻿import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import api from "../services/server";
+
 import "../styles/exibProduto.css";
 
-const products = [
-  {
-    id: 1,
-    name: "Cadeira com estofado",
-    price: "185",
-    image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=800",
-  },
-  {
-    id: 2,
-    name: "Guarda Roupa 3 portas",
-    price: "485",
-    image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=800",
-  },
-  {
-    id: 3,
-    name: "Mesa Redonda",
-    price: "355",
-    image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=800",
-  },
-  {
-    id: 4,
-    name: "Sofá Retrô Rústico",
-    price: "455",
-    image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=800",
-  },
-  {
-    id: 5,
-    name: "Poltrona de Madeira",
-    price: "375",
-    image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=800",
-  },
-];
+export default function ExibProduto() {
+  const navigate = useNavigate();
 
-export default function ProductShowcase() {
+  const { id } = useParams();
+
+  const [zoomAtivo, setZoomAtivo] = useState(false);
+
+  const [produto, setProduto] = useState(null);
+
+  const [relacionados, setRelacionados] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    async function carregarProduto() {
+      try {
+        setLoading(true);
+
+        // PRODUTO PRINCIPAL
+
+        const response = await api.get(`/produtos/id/${id}`);
+
+        const produtoAtual = response.data;
+
+        setProduto(produtoAtual);
+
+        // PRODUTOS RELACIONADOS
+
+        const relacionadosResponse = await api.get(
+          `/produtos/categoria/${produtoAtual.categoria}`
+        );
+
+        const produtosRelacionados =
+          relacionadosResponse.data.filter(
+            (item) => item.id !== produtoAtual.id
+          );
+
+        setRelacionados(produtosRelacionados);
+
+      } catch (err) {
+
+        console.error("Erro ao carregar produto:", err);
+
+        setError("Não foi possível visualizar o produto.");
+
+      } finally {
+
+        setLoading(false);
+      }
+    }
+
+    if (id) {
+      carregarProduto();
+    }
+
+  }, [id]);
+
+  const precoAtual = useMemo(() => {
+    return produto ? Number(produto.preco) : 0;
+  }, [produto]);
+
+  const precoAntigo = useMemo(() => {
+    return precoAtual > 0
+      ? (precoAtual * 1.2).toFixed(2)
+      : "0.00";
+  }, [precoAtual]);
+
+  const estoqueIndisponivel = useMemo(() => {
+    return produto && Number(produto.estoque) === 0;
+  }, [produto]);
+
+  function irParaProduto(produtoId) {
+    navigate(`/produto/${produtoId}`);
+  }
+
+  if (loading) {
+    return (
+      <div className="loading">
+        Carregando produto...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="error">
+        {error}
+      </div>
+    );
+  }
+
+  if (!produto) {
+    return (
+      <div className="error">
+        Produto não encontrado.
+      </div>
+    );
+  }
+
+  function compartilharProduto() {
+    const link = window.location.href;
+
+    if (navigator.share) {
+      navigator.share({
+        title: produto.nome,
+        text: `Confira este produto: ${produto.nome}`,
+        url: link
+      });
+    } else {
+      navigator.clipboard.writeText(link);
+
+      alert("Link do produto copiado!");
+    }
+  }
+
   return (
     <div className="showcase-container">
+
+      {/* BOTÃO VOLTAR */}
+
+      <button
+        className="back-button"
+        onClick={() => navigate(-1)}
+      >
+        ❮
+      </button>
+
       {/* TOPO */}
-      <div className="product-view">
+
+      <section className="product-view">
+
         {/* IMAGEM */}
+
         <div className="product-image">
-          <button className="back-button">←</button>
 
           <img
-            src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200"
-            alt="Mesa de jantar"
+            src={produto.foto || "/placeholder.png"}
+            alt={produto.nome}
+            className="main-product-image"
+            onClick={() => setZoomAtivo(true)}
           />
+
         </div>
 
-        {/* INFORMAÇÕES */}
-        <div className="product-info">
-          <h2>
-            MESA JMCAL LIVING 2.2
-            <br />
-            (5583) V/D RET ILUMINADO
-            <br />
-            para 8 pessoas
-          </h2>
+        {/* PAINEL */}
 
-          <span className="old-price">De R$ 5.230,00 por</span>
+        <div className="product-panel">
 
-          <h1>R$ 4.404,00</h1>
+          {/* ESQUERDA */}
 
-          <p className="installments">Em estoque • 4x</p>
+          <div className="product-info">
 
-          <button className="whatsapp-btn">
-            WhatsApp
-          </button>
+            <h2>
+              {produto.nome}
+            </h2>
 
-          <div className="details-box">
-            <p>
-              Mesa de jantar JMCAL Living
-              <br />
-              com madeira MDF.
+            <span className="old-price">
+              De R$ {precoAntigo} por
+            </span>
+
+            <h1>
+              R$ {precoAtual.toFixed(2)}
+            </h1>
+
+            <p className="stock-text">
+              {produto.estoque > 0
+                ? `Em estoque - ${produto.estoque}`
+                : "Fora de estoque"}
             </p>
 
-            <ul>
-              <li>Comprimento: 2.20m</li>
-              <li>Largura: 90cm</li>
-              <li>Altura: 75cm</li>
-            </ul>
+            <div className="whatsapp-area">
+
+              <p>
+                Finalize sua compra pelo Whatsapp
+              </p>
+
+              <button className="whatsapp-btn">
+                <img src="/whatsapp.png" alt="WhatsApp" />
+              </button>
+              <button
+                className="share-btn"
+                onClick={compartilharProduto}
+              >
+                Compartilhar produto
+              </button>
+
+            </div>
+
           </div>
 
-          <div className="stock">
-            <strong>Estoque disponível.</strong>
-            <p>Personalize e entregue com nosso vendedor no WhatsApp.</p>
+          {/* DIREITA */}
+
+          <div className="details-box">
+
+            <div>
+
+              <p>
+                {produto.descricao || produto.nome}
+              </p>
+
+            </div>
+
+            <div
+              className={`stock ${estoqueIndisponivel
+                ? "unavailable"
+                : ""
+                }`}
+            >
+
+              <strong>
+
+                {estoqueIndisponivel
+                  ? "Estoque indisponível."
+                  : "Estoque disponível."}
+
+              </strong>
+
+              <p>
+
+                {estoqueIndisponivel
+                  ? "Este produto está temporariamente fora de estoque."
+                  : "Personalize a entrega com nosso vendedor no whatsapp."}
+
+              </p>
+
+            </div>
+
           </div>
+
         </div>
-      </div>
+
+      </section>
 
       {/* DIVISOR */}
+
       <div className="divider"></div>
 
-      {/* LISTA DE PRODUTOS */}
-      <div className="products-grid">
-        {products.map((item) => (
-          <div className="product-card" key={item.id}>
-            <img src={item.image} alt={item.name} />
+      {/* RELACIONADOS */}
 
-            <p className="product-name">{item.name}</p>
+      <section className="related-products-container">
 
-            <div className="card-footer">
-              <span>R$ {item.price}</span>
+        <div className="products-grid">
 
-              <button>Ver Mais</button>
-            </div>
-          </div>
-        ))}
-      </div>
+          {relacionados.length === 0 ? (
+
+            <p className="no-related">
+              Nenhum produto relacionado encontrado.
+            </p>
+
+          ) : (
+
+            relacionados.map((item) => (
+
+              <div
+                className="product-card"
+                key={item.id}
+              >
+                <img
+                  src={item.foto || "/placeholder.png"}
+                  alt={item.nome}
+                  className="related-clickable-image"
+                  onClick={() => irParaProduto(item.id)}
+                />
+
+                <p className="product-name">
+                  {item.nome}
+                </p>
+
+                <div className="card-footer">
+
+                  <span>
+                    R$ {Number(item.preco).toFixed(2)}
+                  </span>
+
+                  <button
+                    onClick={() => irParaProduto(item.id)}
+                  >
+                    Ver Mais
+                  </button>
+
+                </div>
+
+              </div>
+
+            ))
+          )}
+
+        </div>
+
+      </section>
+      {/* MODAL ZOOM */}
+
+      {zoomAtivo && (
+        <div
+          className="zoom-overlay"
+          onClick={() => setZoomAtivo(false)}
+        >
+          <img
+            src={produto.foto || "/placeholder.png"}
+            alt={produto.nome}
+            className="zoom-image"
+          />
+        </div>
+      )}
+
     </div>
   );
 }

@@ -1,6 +1,6 @@
 const { Router } = require('express')
 const auth = require('../middlewares/auth')
-const admin = require('../middlewares/admin')
+const upload = require('../middlewares/upload')
 
 const produtoController = require('../controllers/ProdutoController')
 const administradorController = require('../controllers/AdministradorController')
@@ -14,38 +14,34 @@ routes.get('/', (req, res) => {
     message: 'API do catálogo online funcionando!'
   })
 })
+
 // Rotas para autenticação
 routes.use('/auth', authRoutes)
 
 // Rotas para administradores
-routes.post('/admin/login', administradorController.login)
-routes.post('/administradores', administradorController.criar)
+routes.post(
+  '/administradores',
+  auth,
+  administradorController.criar
+)
 
-
-// Produtos públicos
-routes.get('/produtos', produtoController.listar)
+// Rotas para produtos
 routes.get('/produtos/id/:id', produtoController.listarPorId)
 routes.get('/produtos/categoria/:categoria', produtoController.listarPorCategoria)
-// Rotas para produtos
 routes.get('/produtos', produtoController.listar)
-routes.get('/produtos/id/:id', auth, produtoController.listarPorId)
-routes.get('/produtos/categoria/:categoria', auth, produtoController.listarPorCategoria)
-routes.put('/produtos/id/:id', auth, produtoController.atualizar)
-routes.post('/produtos', auth, produtoController.criar)
-routes.delete('/produtos/id/:id', auth, produtoController.deletar)
 
+routes.put(
+  '/produtos/id/:id',
+  auth,
+  upload.single('foto'),
+  produtoController.atualizar
+)
 
-// Produtos protegidos
-routes.post('/produtos', auth, admin,produtoController.criar)
-routes.put('/produtos/id/:id', auth, admin, produtoController.atualizar)
-routes.delete('/produtos/id/:id', auth, admin, produtoController.deletar)
+routes.post('/produtos', upload.single('foto'), produtoController.criar)
+routes.delete('/produtos/id/:id', produtoController.deletar)
 
-// Usuários
+// Rotas para usuários
 routes.post('/usuarios', userController.criar)
-
-// Usuários protegidos
-routes.get('/usuarios', auth, userController.listar)
-
 routes.get('/usuarios', userController.listar)
 routes.get('/usuarios/id/:id', auth, userController.encontrarPorId)
 routes.get('/usuarios/email/:email', auth, userController.encontrarPorEmail)
