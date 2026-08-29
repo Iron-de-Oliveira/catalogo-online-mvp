@@ -1,3 +1,31 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap");
+
+:root {
+  /* Paleta oficial do projeto (definida no protótipo) */
+  --color-white: #ffffff;
+  --color-amber: #feab03;
+  --color-amber-dark: #dd9400;
+  --color-navy: #023047;
+  --color-navy-dark: #011c2b;
+  --color-cream: #fffaf1;
+  --color-ink: #0c2836;
+  --color-alert: #d8481f;
+
+  /* Tipografia */
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Inter", Arial, sans-serif;
+
+  /* Escala de forma */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+
+  /* Sombras com tinta da marca (em vez de preto puro) */
+  --shadow-sm: 0 2px 8px rgba(2, 48, 71, .12);
+  --shadow-md: 0 8px 20px rgba(2, 48, 71, .16);
+  --shadow-lg: 0 14px 34px rgba(2, 48, 71, .22);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -14,8 +42,9 @@ body {
   width: 100%;
   min-width: 320px;
   min-height: 100vh;
-  background: #1f1f1f;
-  font-family: Arial, sans-serif;
+  background: var(--color-navy);
+  font-family: var(--font-body);
+  color: var(--color-ink);
   overflow-x: hidden;
 }
 
@@ -34,7 +63,7 @@ button {
   width: 100%;
   min-height: 100vh;
   min-height: 100svh;
-  background: white;
+  background: var(--color-white);
   padding: 14px clamp(16px, 4vw, 58px) 30px;
   overflow-x: hidden;
 }
@@ -47,6 +76,8 @@ button {
   align-items: center;
   gap: clamp(12px, 2vw, 22px);
   margin-bottom: 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(2, 48, 71, .08);
 }
 
 .logo {
@@ -64,11 +95,12 @@ button {
 }
 
 .logo h2 {
-  font-family: Georgia, serif;
-  font-size: clamp(16px, 1.5vw, 18px);
+  font-family: var(--font-display);
+  font-size: clamp(17px, 1.6vw, 20px);
   font-weight: 600;
-  color: #111;
+  color: var(--color-navy);
   white-space: nowrap;
+  letter-spacing: .2px;
 }
 
 /* SEARCH */
@@ -76,20 +108,28 @@ button {
 .search-bar {
   width: 100%;
   min-width: 0;
-  height: 38px;
-  background: #d6d6d6;
-  border-radius: 7px;
+  height: 40px;
+  background: var(--color-cream);
+  border: 1px solid rgba(2, 48, 71, .12);
+  border-radius: var(--radius-md);
   position: relative;
   display: flex;
   align-items: center;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.search-bar:focus-within {
+  border-color: var(--color-amber);
+  box-shadow: 0 0 0 3px rgba(254, 171, 3, .18);
 }
 
 .menu-icon {
   width: 42px;
   flex: 0 0 42px;
   text-align: center;
-  font-size: 22px;
-  color: #555;
+  font-size: 20px;
+  color: var(--color-navy);
+  opacity: .55;
 }
 
 .search-bar input {
@@ -100,22 +140,30 @@ button {
   border: none;
   outline: none;
   padding: 0 42px 0 8px;
+  color: var(--color-ink);
+  font-family: var(--font-body);
 }
 
 .search-icon {
   position: absolute;
-  right: 8px;
+  right: 6px;
   top: 50%;
   transform: translateY(-50%);
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   display: grid;
   place-items: center;
-  font-size: 18px;
-  color: #8a8a8a;
+  font-size: 16px;
+  color: var(--color-navy);
   background: transparent;
   border: none;
   cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background .2s ease;
+}
+
+.search-icon:hover {
+  background: rgba(2, 48, 71, .08);
 }
 
 /* HEADER ACTIONS */
@@ -136,7 +184,7 @@ button {
   gap: 7px;
   font-size: 14px;
   font-weight: 500;
-  color: #222;
+  color: var(--color-navy);
   cursor: pointer;
   white-space: nowrap;
 }
@@ -146,19 +194,22 @@ button {
 }
 
 .login-btn {
-  background: #123b5d;
-  color: white;
+  background: var(--color-navy);
+  color: var(--color-white);
   border: none;
-  padding: 9px 16px;
+  padding: 9px 18px;
   min-height: 38px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  font-weight: 400;
+  font-weight: 600;
+  font-size: 14px;
   white-space: nowrap;
+  transition: background .2s ease, transform .15s ease;
 }
 
 .login-btn:hover {
-  background: #0d2a42;
+  background: var(--color-navy-dark);
+  transform: translateY(-1px);
 }
 
 /* HERO */
@@ -166,51 +217,67 @@ button {
 .hero {
   width: 100%;
   min-height: clamp(280px, 34vw, 385px);
-  background-image: url("/banner.png");
+  background-image: linear-gradient(90deg, rgba(255,255,255,.72) 0%, rgba(255,255,255,.28) 45%, rgba(255,255,255,0) 65%), url("/banner.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  border-radius: 2px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, .35);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
   display: flex;
   align-items: flex-start;
-  padding: clamp(18px, 3vw, 28px);
+  padding: clamp(18px, 3vw, 32px);
   overflow: hidden;
 }
 
 .hero-text {
   width: min(55%, 620px);
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(16px, 2.4vw, 26px);
 }
 
 .hero-text h1 {
-  color: #00384a;
-  font-size: clamp(22px, 2.5vw, 32px);
-  line-height: 1.25;
-  letter-spacing: clamp(.5px, .2vw, 2px);
-  font-weight: 800;
+  font-family: var(--font-display);
+  color: var(--color-navy);
+  font-size: clamp(24px, 2.7vw, 34px);
+  line-height: 1.2;
+  letter-spacing: .2px;
+  font-weight: 600;
   margin-bottom: 0;
-  text-shadow: #d3d3d3 0 0 3px;
 }
 
 .hero-text button {
-  background: #ffbf00;
-  color: #00384a;
+  background: var(--color-amber);
+  color: var(--color-navy);
   border: none;
-  padding: 17px 23px;
-  border-radius: 13px;
-  font-size: 18px;
-  font-weight: 800;
+  padding: 15px 26px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 15px;
+  letter-spacing: .3px;
+  font-weight: 700;
+  text-transform: uppercase;
   cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: background .2s ease, transform .15s ease, box-shadow .2s ease;
+}
+
+.hero-text button:hover {
+  background: var(--color-amber-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 /* CATEGORIAS */
 
 .categories-container {
   width: 100%;
-  background: #d9d9d9;
-  border-radius: 4px;
-  margin-top: 10px;
+  background: var(--color-cream);
+  border: 1px solid rgba(2, 48, 71, .08);
+  border-radius: var(--radius-md);
+  margin-top: 14px;
   overflow: hidden;
 }
 
@@ -220,7 +287,7 @@ button {
   justify-content: space-around;
   align-items: center;
   gap: 8px;
-  background: #d3d3d3;
+  background: transparent;
   padding: 8px 18px;
   overflow-x: auto;
   scrollbar-width: thin;
@@ -235,18 +302,20 @@ button {
   min-height: 36px;
   background: transparent;
   border: none;
-  color: #1f1f1f;
+  color: var(--color-navy);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: .4px;
   cursor: pointer;
-  transition: .2s;
-  padding: 6px 8px;
+  transition: color .2s ease;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
   white-space: nowrap;
 }
 
 .categories button:hover {
-  color: #0d2a42;
+  color: var(--color-amber-dark);
+  background: rgba(254, 171, 3, .12);
 }
 
 /* CATEGORIAS EXPANDIDAS */
@@ -256,26 +325,28 @@ button {
   grid-template-columns: repeat(5, minmax(110px, 1fr));
   gap: 10px;
   padding: 15px 10px 20px;
-  background: #d3d3d3;
+  background: transparent;
+  border-top: 1px solid rgba(2, 48, 71, .08);
   animation: expandirCategorias .25s ease;
 }
 
 .extra-categories button {
   width: 100%;
   min-height: 38px;
-  border-radius: 2px;
-  background: white;
-  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-white);
+  color: var(--color-navy);
+  border: 1px solid rgba(2, 48, 71, .1);
   padding: 8px 10px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: .2s;
+  transition: background .2s ease, color .2s ease;
 }
 
 .extra-categories button:hover {
-  background: #0d2a42;
-  color: white;
+  background: var(--color-navy);
+  color: var(--color-white);
 }
 
 @keyframes expandirCategorias {
@@ -295,10 +366,11 @@ button {
 .products-grid {
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 14px;
-  margin-top: 25px;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 16px;
+  margin-top: 28px;
   align-items: stretch;
+  scroll-margin-top: 24px;
 }
 
 .product-card {
@@ -308,14 +380,16 @@ button {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background: #eeac11;
-  border-radius: 10px;
-  padding: 8px;
-  transition: .3s;
+  background: var(--color-amber);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  box-shadow: var(--shadow-sm);
+  transition: transform .25s ease, box-shadow .25s ease;
 }
 
 .product-card:hover {
-  transform: scale(1.03);
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
 }
 
 .product-card img {
@@ -324,17 +398,18 @@ button {
   height: auto;
   min-height: 130px;
   object-fit: contain;
-  background: #fff;
-  border-radius: 6px;
+  background: var(--color-white);
+  border-radius: var(--radius-sm);
   padding: 8px;
   margin-bottom: 10px;
+  cursor: pointer;
 }
 
 .product-card h3 {
   font-size: 13px;
   margin: 0;
-  color: #123b5d;
-  font-weight: bold;
+  color: var(--color-navy);
+  font-weight: 700;
   overflow-wrap: anywhere;
 }
 
@@ -343,31 +418,33 @@ button {
   justify-content: space-between;
   align-items: center;
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
 .product-footer span {
-  color: #ff3c00;
-  font-weight: bold;
-  font-size: clamp(15px, 1.5vw, 18px);
+  color: var(--color-navy);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(15px, 1.5vw, 19px);
   line-height: 1.1;
 }
 
 .product-footer button {
   flex: 0 0 auto;
-  background: #000b36;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
-  color: white;
+  background: var(--color-navy);
+  color: var(--color-white);
   border: none;
-  padding: 7px 9px;
-  min-height: 32px;
+  padding: 8px 12px;
+  min-height: 34px;
   font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
+  transition: background .2s ease;
 }
 
 .product-footer button:hover {
-  background: #0d2a42;
+  background: var(--color-navy-dark);
 }
 
 .loading,
@@ -376,6 +453,7 @@ button {
   text-align: center;
   padding: 30px;
   font-weight: 600;
+  color: var(--color-navy);
 }
 
 @media (max-width: 1024px) {
