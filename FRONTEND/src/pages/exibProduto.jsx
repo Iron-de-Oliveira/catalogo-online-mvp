@@ -105,7 +105,7 @@ export default function ExibProduto() {
     );
   }
 
-   // 🔵 NÚMERO DA LOJA - troque pelo número real (DDI + DDD + número, só dígitos)
+  // 🔵 NÚMERO DA LOJA - troque pelo número real (DDI + DDD + número, só dígitos)
   const NUMERO_WHATSAPP_LOJA = "5500000000000"; // ex: 55 (Brasil) + DDD + número
 
   function finalizarCompraWhatsapp() {
@@ -206,12 +206,12 @@ export default function ExibProduto() {
                 Finalize sua compra pelo Whatsapp
               </p>
 
-             <button
-  className="whatsapp-btn"
-  onClick={finalizarCompraWhatsapp}
->
-  <img src="/whatsapp.png" alt="WhatsApp" />
-</button>
+              <button
+                className="whatsapp-btn"
+                onClick={finalizarCompraWhatsapp}
+              >
+                <img src="/whatsapp.png" alt="WhatsApp" />
+              </button>
               <button
                 className="share-btn"
                 onClick={compartilharProduto}
