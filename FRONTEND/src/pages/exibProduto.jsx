@@ -105,6 +105,30 @@ export default function ExibProduto() {
     );
   }
 
+   // 🔵 NÚMERO DA LOJA - troque pelo número real (DDI + DDD + número, só dígitos)
+  const NUMERO_WHATSAPP_LOJA = "5500000000000"; // ex: 55 (Brasil) + DDD + número
+
+  function finalizarCompraWhatsapp() {
+    if (!produto) return;
+
+    const link = window.location.href;
+
+    const mensagem =
+      `Olá! Tenho interesse em comprar o seguinte produto:\n\n` +
+      `Produto: ${produto.nome}\n` +
+      `Valor: R$ ${precoAtual.toFixed(2)}\n` +
+      `Descrição: ${produto.descricao || "Sem descrição"}\n` +
+      (produto.categoria ? `Categoria: ${produto.categoria}\n` : "") +
+      `Link: ${link}\n\n` +
+      `Gostaria de obter mais informações sobre a compra.`;
+
+    const mensagemCodificada = encodeURIComponent(mensagem);
+
+    const urlWhatsapp = `https://wa.me/${NUMERO_WHATSAPP_LOJA}?text=${mensagemCodificada}`;
+
+    window.open(urlWhatsapp, "_blank");
+  }
+
   function compartilharProduto() {
     const link = window.location.href;
 
@@ -182,9 +206,12 @@ export default function ExibProduto() {
                 Finalize sua compra pelo Whatsapp
               </p>
 
-              <button className="whatsapp-btn">
-                <img src="/whatsapp.png" alt="WhatsApp" />
-              </button>
+             <button
+  className="whatsapp-btn"
+  onClick={finalizarCompraWhatsapp}
+>
+  <img src="/whatsapp.png" alt="WhatsApp" />
+</button>
               <button
                 className="share-btn"
                 onClick={compartilharProduto}
