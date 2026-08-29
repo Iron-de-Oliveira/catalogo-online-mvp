@@ -151,8 +151,8 @@ export default function ExibProduto() {
       {/* BOTÃO VOLTAR */}
 
       <button
-        className="back-button"
-        onClick={() => navigate(-1)}
+    className="back-button"
+  onClick={() => navigate("/")}
       >
         ❮
       </button>

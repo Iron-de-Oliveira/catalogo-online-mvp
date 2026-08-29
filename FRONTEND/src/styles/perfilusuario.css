@@ -179,15 +179,20 @@
 
 .back-home {
   position: absolute;
-  left: 25px;
+  left: 20px;
   top: 50%;
   transform: translateY(-50%);
-  background: transparent !important;
-  border: none !important;
-  color: #000;
-  font-size: 58px;
-  font-weight: bold;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 24px;
+  font-weight: normal;
   line-height: 1;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   padding: 0;
   margin: 0;
@@ -197,6 +202,7 @@
 .back-home:hover {
   transform: translateY(-50%) scale(1.08);
 }
+
 
 @media (max-width: 760px) {
   .perfil-topo {
@@ -222,16 +228,21 @@
   }
 
   .back-home {
-    left: 18px;
-    top: 18px;
-    transform: none;
-    color: white;
-    font-size: 44px;
-  }
+  left: 14px;
+  top: 14px;
+  transform: none;
 
-  .back-home:hover {
-    transform: scale(1.08);
-  }
+  color: white;
+  font-size: 26px;
+
+  width: 35px;
+  height: 35px;
+}
+
+.back-home:hover {
+  transform: scale(1.05);
+}
+
 
   .form-content {
     grid-template-columns: 1fr;
