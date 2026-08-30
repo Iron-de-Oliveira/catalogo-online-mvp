@@ -17,6 +17,7 @@ body {
 }
 
 .showcase-container {
+  position: relative;
   width: 100%;
   min-height: 100vh;
   min-height: 100svh;
@@ -29,19 +30,30 @@ body {
   background: transparent;
   border: none;
   color: var(--color-navy);
-  font-size: clamp(30px, 3.4vw, 38px);
-  font-weight: bold;
-  cursor: pointer;
-  margin-bottom: 10px;
+  font-size: 24px;
+  font-weight: normal;
   line-height: 1;
-  padding: 4px 10px;
-  border-radius: var(--radius-sm);
-  transition: background .2s ease;
+
+  width: 35px;
+  height: 35px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 10px;
+
+  user-select: none;
+
+  transition: transform 0.2s ease;
 }
 
 .back-button:hover {
-  background: rgba(2, 48, 71, .08);
+  transform: scale(1.08);
 }
+
 
 .product-view {
   width: 100%;
