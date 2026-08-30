@@ -2,39 +2,69 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const prisma = require('../config/prisma')
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+function validarCadastro({ nome, email, senha }) {
+  const errors = {}
+
+  if (typeof nome !== 'string' || nome.length < 2 || nome.length > 100) {
+    errors.nome = 'O nome deve ter entre 2 e 100 caracteres.'
+  }
+
+  if (typeof email !== 'string' || email.length > 254 || !EMAIL_REGEX.test(email)) {
+    errors.email = 'Informe um e-mail válido.'
+  }
+
+  if (typeof senha !== 'string' || senha.length < 8 || senha.length > 72) {
+    errors.senha = 'A senha deve ter entre 8 e 72 caracteres.'
+  } else if (!/[a-z]/.test(senha) || !/[A-Z]/.test(senha) || !/\d/.test(senha) || !/[^A-Za-z0-9]/.test(senha)) {
+    errors.senha = 'A senha deve conter letra maiúscula, minúscula, número e caractere especial.'
+  }
+
+  return errors
+}
+
 class AuthController {
   async register(req, res) {
     try {
       const { nome, email, senha } = req.body || {}
 
-      const camposObrigatoriosPreenchidos = [nome, email, senha].every(
-        (campo) => typeof campo === 'string' && campo.trim().length > 0
-      )
+      const dadosCadastro = {
+        nome: typeof nome === 'string' ? nome.trim().replace(/\s+/g, ' ') : nome,
+        email: typeof email === 'string' ? email.trim().toLowerCase() : email,
+        senha
+      }
 
-      if (!camposObrigatoriosPreenchidos) {
+      const errors = validarCadastro(dadosCadastro)
+
+      if (Object.keys(errors).length > 0) {
         return res.status(400).json({
-          error: 'Preencha todos os campos obrigatórios.'
+          error: 'Corrija os campos informados.',
+          errors
         })
       }
 
       const usuarioExiste = await prisma.usuario.findUnique({
         where: {
-          email
+          email: dadosCadastro.email
         }
       })
 
       if (usuarioExiste) {
         return res.status(400).json({
-          error: 'Usuário já existe'
+          error: 'Já existe uma conta com este e-mail.',
+          errors: {
+            email: 'Este e-mail já está em uso.'
+          }
         })
       }
 
-      const senhaHash = await bcrypt.hash(senha, 10)
+      const senhaHash = await bcrypt.hash(dadosCadastro.senha, 10)
 
       const usuario = await prisma.usuario.create({
         data: {
-          nome,
-          email,
+          nome: dadosCadastro.nome,
+          email: dadosCadastro.email,
           senha: senhaHash
         }
       })
@@ -45,6 +75,15 @@ class AuthController {
         email: usuario.email
       })
     } catch (error) {
+      if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
+        return res.status(400).json({
+          error: 'Já existe uma conta com este e-mail.',
+          errors: {
+            email: 'Este e-mail já está em uso.'
+          }
+        })
+      }
+
       return res.status(500).json({
         error: 'Erro ao cadastrar usuário'
       })
@@ -123,13 +162,8 @@ class AuthController {
 
       try {
         senhaCorreta = await bcrypt.compare(senha, administrador.senha)
-      } catch (e) {
+      } catch (error) {
         senhaCorreta = false
-      }
-
-      // fallback para casos onde a senha foi salva sem hash
-      if (!senhaCorreta) {
-        senhaCorreta = senha === administrador.senha
       }
 
       if (!senhaCorreta) {
