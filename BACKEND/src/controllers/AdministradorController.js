@@ -21,7 +21,10 @@ class AdministradorController {
         }
       })
 
-      return res.status(201).json(administrador)
+      return res.status(201).json({
+        id: administrador.id,
+        cpf: administrador.cpf
+      })
     } catch (error) {
       console.log(error)
 

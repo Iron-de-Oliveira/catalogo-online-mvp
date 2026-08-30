@@ -1,5 +1,6 @@
 const { Router } = require('express')
 const auth = require('../middlewares/auth')
+const admin = require('../middlewares/admin')
 const upload = require('../middlewares/upload')
 
 const produtoController = require('../controllers/ProdutoController')
@@ -22,6 +23,7 @@ routes.use('/auth', authRoutes)
 routes.post(
   '/administradores',
   auth,
+  admin,
   administradorController.criar
 )
 
@@ -45,6 +47,7 @@ routes.get(
 routes.put(
   '/produtos/id/:id',
   auth,
+  admin,
   upload.single('foto'),
   produtoController.atualizar
 )
@@ -52,6 +55,8 @@ routes.put(
 // Criar produto
 routes.post(
   '/produtos',
+  auth,
+  admin,
   upload.single('foto'),
   produtoController.criar
 )
@@ -59,20 +64,12 @@ routes.post(
 // Deletar produto
 routes.delete(
   '/produtos/id/:id',
+  auth,
+  admin,
   produtoController.deletar
 )
 
-// Rotas para usuários
-routes.post(
-  '/usuarios',
-  userController.criar
-)
-
-routes.get(
-  '/usuarios',
-  userController.listar
-)
-
+// Rotas para o próprio usuário autenticado
 routes.get(
   '/usuarios/id/:id',
   auth,
