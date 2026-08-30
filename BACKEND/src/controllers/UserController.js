@@ -1,203 +1,129 @@
-const prisma = require("../config/prisma");
+const bcrypt = require('bcryptjs')
+const prisma = require('../config/prisma')
 
 class UserController {
-
-  // criar um novo usuário
-  async criar(req, res) {
-    try {
-
-      const {
-        nome,
-        email,
-        senha
-      } = req.body
-
-      if (!nome || !email || !senha) {
-        return res.status(400).json({
-          error: 'Preencha todos os campos obrigatórios.'
-        })
-      }
-
-      const usuarioExiste = await prisma.cliente.findUnique({
-        where: {
-          email
-        }
-      })
-
-      if (usuarioExiste) {
-        return res.status(400).json({
-          error: 'E-mail já cadastrado.'
-        })
-      }
-
-      const usuario = await prisma.cliente.create({
-        data: {
-          nome,
-          email,
-          senha
-        }
-      })
-
-      return res.status(201).json(usuario)
-
-    } catch (error) {
-
-      console.log(error)
-
-      return res.status(500).json({
-        error: 'Erro ao criar usuário.'
-      })
-    }
-  }
-
-  // encontrar todos os usuários cadastrados
-  async listar(req, res) {
-    try {
-
-      const usuarios = await prisma.cliente.findMany()
-
-      return res.status(200).json(usuarios)
-
-    } catch (error) {
-
-      console.log(error)
-
-      return res.status(500).json({
-        error: 'Erro ao listar usuários.'
-      })
-    }
-  }
-
-  // encontrar um usuário por ID
   async encontrarPorId(req, res) {
     try {
-      const { id } = req.params
+      if (req.params.id !== req.userId) {
+        return res.status(403).json({ error: 'Acesso não autorizado.' })
+      }
 
-      const usuario = await prisma.cliente.findUnique({
-        where: {
-          id: parseInt(id)
-        }
+      const usuario = await prisma.usuario.findUnique({
+        where: { id: req.userId },
+        select: { id: true, nome: true, email: true }
       })
 
       if (!usuario) {
-        return res.status(404).json({
-          error: 'Usuário não encontrado.'
-        })
+        return res.status(404).json({ error: 'Usuário não encontrado.' })
       }
+
       return res.status(200).json(usuario)
     } catch (error) {
-      console.log(error)
-      return res.status(500).json({
-        error: 'Erro ao encontrar usuário.'
-      })
+      return res.status(500).json({ error: 'Erro ao encontrar usuário.' })
     }
   }
 
-  //encontrar um usuário por email
   async encontrarPorEmail(req, res) {
     try {
-      const { email } = req.params
-
-      const usuario = await prisma.cliente.findUnique({
-        where: {
-          email
-        }
+      const usuario = await prisma.usuario.findUnique({
+        where: { email: req.params.email.toLowerCase() },
+        select: { id: true, nome: true, email: true }
       })
+
       if (!usuario) {
-        return res.status(404).json({
-          error: 'Usuário não encontrado.'
-        })
+        return res.status(404).json({ error: 'Usuário não encontrado.' })
       }
+
+      if (usuario.id !== req.userId) {
+        return res.status(403).json({ error: 'Acesso não autorizado.' })
+      }
+
       return res.status(200).json(usuario)
     } catch (error) {
-      console.log(error)
-      return res.status(500).json({
-        error: 'Erro ao encontrar usuário.'
-      })
+      return res.status(500).json({ error: 'Erro ao encontrar usuário.' })
     }
   }
 
-  // deletar um usuário por email
   async deletarPorEmail(req, res) {
     try {
-      const { email } = req.params
-      const usuario = await prisma.cliente.delete({
-        where: {
-          email
-        }
+      const usuario = await prisma.usuario.findUnique({
+        where: { email: req.params.email.toLowerCase() },
+        select: { id: true }
       })
+
       if (!usuario) {
-        return res.status(404).json({
-          error: 'Usuário não encontrado.'
-        })
+        return res.status(404).json({ error: 'Usuário não encontrado.' })
       }
-      return res.status(200).json({
-        message: 'Usuário deletado com sucesso.'
-      })
+
+      if (usuario.id !== req.userId) {
+        return res.status(403).json({ error: 'Acesso não autorizado.' })
+      }
+
+      await prisma.usuario.delete({ where: { id: req.userId } })
+      return res.status(200).json({ message: 'Usuário deletado com sucesso.' })
     } catch (error) {
-      console.log(error)
-      return res.status(500).json({
-        error: 'Erro ao deletar usuário.'
-      })
+      return res.status(500).json({ error: 'Erro ao deletar usuário.' })
     }
   }
 
-  // atualizar um usuário por email
   async atualizarPorEmail(req, res) {
     try {
-      const { email } = req.params;
-      const { nome, senha, email: novoEmail } = req.body;
+      const usuario = await prisma.usuario.findUnique({
+        where: { email: req.params.email.toLowerCase() },
+        select: { id: true }
+      })
 
-      const dadosAtualizacao = {};
-
-      if (nome) {
-        dadosAtualizacao.nome = nome;
+      if (!usuario) {
+        return res.status(404).json({ error: 'Usuário não encontrado.' })
       }
 
-      if (senha) {
-        dadosAtualizacao.senha = senha;
+      if (usuario.id !== req.userId) {
+        return res.status(403).json({ error: 'Acesso não autorizado.' })
       }
 
-      if (novoEmail && novoEmail !== email) {
-        const emailExiste = await prisma.usuario.findUnique({
-          where: {
-            email: novoEmail
-          }
-        });
+      const { nome, senha, email: novoEmail } = req.body || {}
+      const dadosAtualizacao = {}
 
-        if (emailExiste) {
-          return res.status(400).json({
-            error: "Novo e-mail já está cadastrado."
-          });
+      if (typeof nome === 'string' && nome.trim().length >= 2) {
+        dadosAtualizacao.nome = nome.trim().replace(/\s+/g, ' ')
+      }
+
+      if (typeof senha === 'string' && senha.length > 0) {
+        if (senha.length < 8 || senha.length > 72) {
+          return res.status(400).json({ error: 'A senha deve ter entre 8 e 72 caracteres.' })
         }
 
-        dadosAtualizacao.email = novoEmail;
+        if (!/[a-z]/.test(senha) || !/[A-Z]/.test(senha) || !/\d/.test(senha) || !/[^A-Za-z0-9]/.test(senha)) {
+          return res.status(400).json({
+            error: 'A senha deve conter letra maiúscula, minúscula, número e caractere especial.'
+          })
+        }
+        dadosAtualizacao.senha = await bcrypt.hash(senha, 10)
       }
 
-      const usuario = await prisma.usuario.update({
-        where: {
-          email
-        },
-        data: dadosAtualizacao
-      });
+      if (typeof novoEmail === 'string' && novoEmail.trim().length > 0) {
+        dadosAtualizacao.email = novoEmail.trim().toLowerCase()
+      }
 
-      return res.status(200).json({
-        id: usuario.id,
-        nome: usuario.nome,
-        email: usuario.email
-      });
+      if (Object.keys(dadosAtualizacao).length === 0) {
+        return res.status(400).json({ error: 'Informe ao menos um campo válido para atualizar.' })
+      }
 
+      const usuarioAtualizado = await prisma.usuario.update({
+        where: { id: req.userId },
+        data: dadosAtualizacao,
+        select: { id: true, nome: true, email: true }
+      })
+
+      return res.status(200).json(usuarioAtualizado)
     } catch (error) {
-      console.log(error);
+      if (error.code === 'P2002') {
+        return res.status(400).json({ error: 'Novo e-mail já está cadastrado.' })
+      }
 
-      return res.status(500).json({
-        error: "Erro ao atualizar usuário."
-      });
+      return res.status(500).json({ error: 'Erro ao atualizar usuário.' })
     }
   }
-
-
-
 }
 
 module.exports = new UserController()

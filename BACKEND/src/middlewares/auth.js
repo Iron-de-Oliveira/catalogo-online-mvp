@@ -9,19 +9,21 @@ function auth(req, res, next) {
     })
   }
 
-  const token = authHeader.split(' ')[1]
+  const [tipo, token] = authHeader.split(' ')
+
+  if (tipo !== 'Bearer' || !token) {
+    return res.status(401).json({
+      error: 'Token inválido'
+    })
+  }
 
   try {
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET
-    )
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
     req.userId = decoded.id
-    req.userTipo = decoded.tipo
+    req.user = decoded
 
     next()
-
   } catch (error) {
     return res.status(401).json({
       error: 'Token inválido'
