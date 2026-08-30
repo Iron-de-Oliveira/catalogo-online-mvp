@@ -106,7 +106,7 @@ export default function ExibProduto() {
   }
 
   // 🔵 NÚMERO DA LOJA - troque pelo número real (DDI + DDD + número, só dígitos)
-  const NUMERO_WHATSAPP_LOJA = "5500000000000"; // ex: 55 (Brasil) + DDD + número
+  const NUMERO_WHATSAPP_LOJA = "5563992679361"; // ex: 55 (Brasil) + DDD + número
 
   function finalizarCompraWhatsapp() {
     if (!produto) return;
