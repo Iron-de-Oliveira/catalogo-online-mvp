@@ -82,8 +82,7 @@ class ProdutoController {
         categoria,
         estoque,
         descricao,
-        preco,
-        idAdministrador
+        preco
       } = req.body
 
       if (
@@ -91,8 +90,7 @@ class ProdutoController {
         !categoria ||
         !estoque ||
         !descricao ||
-        !preco ||
-        !idAdministrador
+        !preco
       ) {
         return res.status(400).json({
           error: 'Preencha todos os campos obrigatórios.'
@@ -117,7 +115,7 @@ class ProdutoController {
 
           administrador: {
             connect: {
-              id: Number(idAdministrador)
+              id: Number(req.userId)
             }
           }
         }

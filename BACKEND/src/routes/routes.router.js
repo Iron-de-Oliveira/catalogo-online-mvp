@@ -1,5 +1,6 @@
 const { Router } = require('express')
 const auth = require('../middlewares/auth')
+const admin = require('../middlewares/admin')
 const upload = require('../middlewares/upload')
 
 const produtoController = require('../controllers/ProdutoController')
@@ -15,17 +16,15 @@ routes.get('/', (req, res) => {
   })
 })
 
-// Rotas para autenticação
 routes.use('/auth', authRoutes)
 
-// Rotas para administradores
 routes.post(
   '/administradores',
   auth,
+  admin,
   administradorController.criar
 )
 
-// Rotas para produtos
 routes.get('/produtos/id/:id', produtoController.listarPorId)
 routes.get('/produtos/categoria/:categoria', produtoController.listarPorCategoria)
 routes.get('/produtos', produtoController.listar)
@@ -33,16 +32,26 @@ routes.get('/produtos', produtoController.listar)
 routes.put(
   '/produtos/id/:id',
   auth,
+  admin,
   upload.single('foto'),
   produtoController.atualizar
 )
 
-routes.post('/produtos', upload.single('foto'), produtoController.criar)
-routes.delete('/produtos/id/:id', produtoController.deletar)
+routes.post(
+  '/produtos',
+  auth,
+  admin,
+  upload.single('foto'),
+  produtoController.criar
+)
 
-// Rotas para usuários
-routes.post('/usuarios', userController.criar)
-routes.get('/usuarios', userController.listar)
+routes.delete(
+  '/produtos/id/:id',
+  auth,
+  admin,
+  produtoController.deletar
+)
+
 routes.get('/usuarios/id/:id', auth, userController.encontrarPorId)
 routes.get('/usuarios/email/:email', auth, userController.encontrarPorEmail)
 routes.delete('/usuarios/email/:email', auth, userController.deletarPorEmail)
