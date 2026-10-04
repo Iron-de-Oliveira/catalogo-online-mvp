@@ -280,14 +280,14 @@ function LoginPage() {
               className="register"
               onClick={() => setTela("cadastro")}
             >
-              Cadastrar-se
+              Não tem conta? Cadastrar-se
             </p>
 
             <button
               className="btn-back"
               onClick={() => setTela("inicio")}
             >
-              ⬅ Sair
+              ⬅ Voltar
             </button>
 
             {mensagemLogin && (
@@ -353,7 +353,7 @@ function LoginPage() {
               className="btn-back"
               onClick={() => setTela("inicio")}
             >
-              ⬅ Sair
+              ⬅ Voltar
             </button>
           </div>
         )}
