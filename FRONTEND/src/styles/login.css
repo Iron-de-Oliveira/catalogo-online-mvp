@@ -326,6 +326,34 @@ body {
     padding: 42px 20px 115px;
   }
 
+  .btn-home-back {
+    position: static;
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    min-height: 40px;
+    margin-bottom: clamp(20px, 4vh, 32px);
+    padding: 8px 14px;
+    border: 1px solid #d8e2df;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 56, 74, .08);
+    color: #174b50;
+    font-family: Arial, sans-serif;
+    font-size: clamp(13px, 3.6vw, 15px);
+    line-height: 1.35;
+    text-align: left;
+    white-space: normal;
+    transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
+  }
+
+  .btn-home-back:hover {
+    border-color: #b7cfca;
+    background: #f5faf8;
+    box-shadow: 0 3px 10px rgba(0, 56, 74, .12);
+  }
+
   .footer {
     position: static;
     margin-top: auto;
@@ -344,6 +372,11 @@ body {
 @media (max-width: 560px) {
   .left-side {
     padding: 30px 16px 105px;
+  }
+
+  .btn-home-back {
+    margin-bottom: 22px;
+    padding: 7px 12px;
   }
 
   .left-side h1 {
