@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../services/server";
+import api, { imagemProdutoUrl } from "../services/server";
 import "../styles/perfilusuario.css";
 
 function PerfilUsuario() {
@@ -8,6 +8,8 @@ function PerfilUsuario() {
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [usuario, setUsuario] = useState(null);
+  const [fotoPerfil, setFotoPerfil] = useState(null);
+  const [previewFoto, setPreviewFoto] = useState(null);
 
   const [formData, setFormData] = useState({
     nome: "",
@@ -37,6 +39,18 @@ function PerfilUsuario() {
       email: usuarioLogado.email || "",
       senha: ""
     });
+
+    setPreviewFoto(usuarioLogado.fotoPerfil || null);
+
+    api.get(`/usuarios/id/${usuarioLogado.id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then(({ data }) => {
+      setUsuario(data);
+      setPreviewFoto(data.fotoPerfil || null);
+      localStorage.setItem("usuario", JSON.stringify(data));
+    }).catch((error) => {
+      console.error("Erro ao carregar foto do perfil:", error);
+    });
   }, [navigate]);
 
   function handleChange(e) {
@@ -46,6 +60,28 @@ function PerfilUsuario() {
       ...prev,
       [name]: value
     }));
+  }
+
+  function handleFotoChange(e) {
+    const arquivo = e.target.files?.[0];
+    if (!arquivo) return;
+
+    const tiposPermitidos = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    if (!tiposPermitidos.includes(arquivo.type)) {
+      setErro("Selecione uma imagem JPEG, PNG, GIF ou WebP.");
+      e.target.value = "";
+      return;
+    }
+
+    if (arquivo.size > 5 * 1024 * 1024) {
+      setErro("A imagem deve ter no máximo 5 MB.");
+      e.target.value = "";
+      return;
+    }
+
+    setErro("");
+    setFotoPerfil(arquivo);
+    setPreviewFoto(URL.createObjectURL(arquivo));
   }
 
   async function atualizarUsuario() {
@@ -61,17 +97,20 @@ function PerfilUsuario() {
         return;
       }
 
-      const dadosAtualizacao = {
-        nome: formData.nome,
-        email: formData.email
-      };
+      const dadosAtualizacao = new FormData();
+      dadosAtualizacao.append("nome", formData.nome);
+      dadosAtualizacao.append("email", formData.email);
 
       if (formData.senha.trim() !== "") {
-        dadosAtualizacao.senha = formData.senha;
+        dadosAtualizacao.append("senha", formData.senha);
+      }
+
+      if (fotoPerfil) {
+        dadosAtualizacao.append("fotoPerfil", fotoPerfil);
       }
 
       const response = await api.put(
-        `/usuarios/email/${usuario.email}`,
+        `/usuarios/email/${encodeURIComponent(usuario.email)}`,
         dadosAtualizacao,
         {
           headers: {
@@ -83,6 +122,8 @@ function PerfilUsuario() {
       localStorage.setItem("usuario", JSON.stringify(response.data));
 
       setUsuario(response.data);
+      setFotoPerfil(null);
+      setPreviewFoto(response.data.fotoPerfil || null);
 
       setFormData({
         nome: response.data.nome || "",
@@ -110,6 +151,8 @@ function PerfilUsuario() {
     setMostrarFormulario(false);
     setErro("");
     setMensagem("");
+    setFotoPerfil(null);
+    setPreviewFoto(usuario.fotoPerfil || null);
 
     setFormData({
       nome: usuario.nome || "",
@@ -136,7 +179,13 @@ function PerfilUsuario() {
         >
           ❮
         </div>
-          <div className="foto-perfil">👤</div>
+          <div className="foto-perfil">
+            {previewFoto ? (
+              <img src={imagemProdutoUrl(previewFoto)} alt={`Foto de ${usuario.nome}`} />
+            ) : (
+              "👤"
+            )}
+          </div>
 
           <input
             className="nome-usuario"
@@ -219,10 +268,12 @@ function PerfilUsuario() {
 
             <div className="foto-upload">
               <p>Nova foto de perfil</p>
-              <input type="file" disabled />
-              <small>
-                Upload de foto ainda não configurado.
-              </small>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/gif,image/webp"
+                onChange={handleFotoChange}
+              />
+              <small>JPEG, PNG, GIF ou WebP. Máximo de 5 MB.</small>
             </div>
           </div>
 

@@ -27,6 +27,7 @@ function LoginPage() {
 
   const [mensagem, setMensagem] = useState("");
   const [erro, setErro] = useState("");
+  const [errosCadastro, setErrosCadastro] = useState({});
   const [carregando, setCarregando] = useState(false);
 
   const [mensagemLogin, setMensagemLogin] = useState("");
@@ -44,6 +45,11 @@ function LoginPage() {
       ...cadastro,
       [name]: value
     });
+    setErrosCadastro((errosAtuais) => ({
+      ...errosAtuais,
+      [name]: undefined
+    }));
+    setErro("");
   }
 
   function handleLoginClienteChange(event) {
@@ -73,6 +79,7 @@ function LoginPage() {
 
     setMensagem("");
     setErro("");
+    setErrosCadastro({});
   }
 
   function limparLoginCliente() {
@@ -100,6 +107,7 @@ function LoginPage() {
       setCarregando(true);
       setErro("");
       setMensagem("");
+      setErrosCadastro({});
 
       const response = await api.post("/auth/register", cadastro);
 
@@ -110,6 +118,7 @@ function LoginPage() {
         email: "",
         senha: ""
       });
+      setErrosCadastro({});
 
       console.log("Usuário criado:", response.data);
 
@@ -120,7 +129,9 @@ function LoginPage() {
     } catch (error) {
       console.log(error);
 
-      if (error.response?.data?.error) {
+      if (error.response?.data?.errors) {
+        setErrosCadastro(error.response.data.errors);
+      } else if (error.response?.data?.error) {
         setErro(error.response.data.error);
       } else {
         setErro("Erro ao cadastrar usuário.");
@@ -197,6 +208,14 @@ function LoginPage() {
   return (
     <div className="container">
       <div className="left-side">
+        <button
+          className="btn-home-back"
+          type="button"
+          onClick={() => navigate("/")}
+        >
+          ← Voltar ao catálogo
+        </button>
+
         {tela === "inicio" && (
           <>
             <h1>Seja bem vindo!</h1>
@@ -362,32 +381,56 @@ function LoginPage() {
           <div className="form-container">
             <h1>Seja bem vindo!</h1>
 
-            <label>Nome:</label>
+            <label htmlFor="cadastro-nome">Nome:</label>
             <input
+              id="cadastro-nome"
               type="text"
               name="nome"
               placeholder="Jonas Judas Josias"
               value={cadastro.nome}
               onChange={handleCadastroChange}
+              aria-invalid={Boolean(errosCadastro.nome)}
+              aria-describedby={errosCadastro.nome ? "erro-cadastro-nome" : undefined}
             />
+            {errosCadastro.nome && (
+              <p id="erro-cadastro-nome" className="field-error" role="alert">
+                {errosCadastro.nome}
+              </p>
+            )}
 
-            <label>Inserir email:</label>
+            <label htmlFor="cadastro-email">Inserir email:</label>
             <input
+              id="cadastro-email"
               type="email"
               name="email"
               placeholder="JJJ@gmail.com"
               value={cadastro.email}
               onChange={handleCadastroChange}
+              aria-invalid={Boolean(errosCadastro.email)}
+              aria-describedby={errosCadastro.email ? "erro-cadastro-email" : undefined}
             />
+            {errosCadastro.email && (
+              <p id="erro-cadastro-email" className="field-error" role="alert">
+                {errosCadastro.email}
+              </p>
+            )}
 
-            <label>Crie uma senha:</label>
+            <label htmlFor="cadastro-senha">Crie uma senha:</label>
             <input
+              id="cadastro-senha"
               type="password"
               name="senha"
               placeholder="**********"
               value={cadastro.senha}
               onChange={handleCadastroChange}
+              aria-invalid={Boolean(errosCadastro.senha)}
+              aria-describedby={errosCadastro.senha ? "erro-cadastro-senha" : undefined}
             />
+            {errosCadastro.senha && (
+              <p id="erro-cadastro-senha" className="field-error" role="alert">
+                {errosCadastro.senha}
+              </p>
+            )}
 
             <div className="buttons">
               <button

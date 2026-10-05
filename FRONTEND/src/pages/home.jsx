@@ -1,7 +1,7 @@
 import "../styles/style.css";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api, { baseURL } from "../services/server";
+import api, { imagemProdutoUrl } from "../services/server";
 
 
 function Home() {
@@ -10,7 +10,14 @@ function Home() {
   const [mostrarMaisCategorias, setMostrarMaisCategorias] = useState(false);
 
   const [logado, setLogado] = useState(!!localStorage.getItem("token"));
-  const [usuario, setUsuario] = useState(null);
+  const [usuario, setUsuario] = useState(() => {
+    try {
+      const usuarioStorage = localStorage.getItem("usuario");
+      return usuarioStorage ? JSON.parse(usuarioStorage) : null;
+    } catch {
+      return null;
+    }
+  });
 
   const [produtos, setProdutos] = useState([]);
   const [produtosFiltrados, setProdutosFiltrados] = useState([]);
@@ -19,10 +26,25 @@ function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
     const usuarioStorage = localStorage.getItem("usuario");
 
-    if (usuarioStorage) {
-      setUsuario(JSON.parse(usuarioStorage));
+    if (token && usuarioStorage) {
+      try {
+        const usuarioSalvo = JSON.parse(usuarioStorage);
+        if (usuarioSalvo.id) {
+          api.get(`/usuarios/id/${usuarioSalvo.id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          }).then(({ data }) => {
+            setUsuario(data);
+            localStorage.setItem("usuario", JSON.stringify(data));
+          }).catch((error) => {
+            console.error("Erro ao atualizar dados do perfil:", error);
+          });
+        }
+      } catch (error) {
+        console.error("Dados locais do usuário inválidos:", error);
+      }
     }
 
     async function carregarProdutos() {
@@ -224,7 +246,15 @@ function Home() {
         <div className="header-actions">
           {logado && usuario && (
             <button className="perfil-btn" onClick={irParaPerfil}>
-              <span className="perfil-icon">👤</span>
+              {usuario.fotoPerfil ? (
+                <img
+                  className="perfil-avatar"
+                  src={imagemProdutoUrl(usuario.fotoPerfil)}
+                  alt=""
+                />
+              ) : (
+                <span className="perfil-icon" aria-hidden="true">👤</span>
+              )}
               <span>Perfil</span>
             </button>
           )}
@@ -310,7 +340,7 @@ function Home() {
           produtosFiltrados.map((produto) => (
             <div className="product-card" key={produto.id}>
               <img
-                 src={produto.foto || "/placeholder.png"}
+                src={imagemProdutoUrl(produto.foto)}
                 alt={produto.nome}
                 onClick={() => irParaProduto(produto.id)}
                 className="clickable-product"

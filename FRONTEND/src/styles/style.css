@@ -145,6 +145,14 @@ button {
   font-size: 24px;
 }
 
+.perfil-avatar {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 .login-btn {
   background: #123b5d;
   color: white;
