@@ -6,5 +6,3 @@
     }
   ]
 }
-
-// configuração do vercel para que o react funcione corretamente, sem isso, ao dar refresh na página, o react não consegue encontrar a rota e dá erro 404.
