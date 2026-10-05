@@ -38,6 +38,13 @@
   font-size: 40px;
 }
 
+.foto-perfil img {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+
 .nome-usuario {
   width: min(300px, 100%);
   min-width: 0;

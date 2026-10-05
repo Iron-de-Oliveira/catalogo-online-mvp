@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../services/server";
+import api, { imagemProdutoUrl } from "../services/server";
 import "../styles/paginaAdministracao.css";
 
 export default function PaginaAdministracao() {
@@ -121,7 +121,7 @@ export default function PaginaAdministracao() {
       idAdministrador: produto.administradorId || 1
     });
 
-    setPreview(produto.foto ? `${api.defaults.baseURL}${produto.foto}` : null);
+    setPreview(produto.foto ? imagemProdutoUrl(produto.foto) : null);
   }
 
   function expandirProduto(produto) {
@@ -432,7 +432,7 @@ export default function PaginaAdministracao() {
                 {produtosFiltrados.map((produto) => (
                   <div className="admin-mini-card" key={produto.id}>
                     <img
-                      src={produto.foto || "/placeholder.png"}
+                      src={imagemProdutoUrl(produto.foto)}
                       alt={produto.nome}
                     />
 
@@ -460,8 +460,8 @@ export default function PaginaAdministracao() {
           <>
             <div className="selected-product-box">
               <img
-                src={produtos.foto || "/placeholder.png"}
-                alt={produtos.nome}
+                src={imagemProdutoUrl(produtoSelecionado.foto)}
+                alt={produtoSelecionado.nome}
               />
 
               <div className="selected-info">
@@ -549,7 +549,7 @@ export default function PaginaAdministracao() {
         {modo === "deletar" && produtoSelecionado && (
           <div className="delete-confirm-box">
             <img
-              src={produtoSelecionado.foto || "/placeholder.png"}
+              src={imagemProdutoUrl(produtoSelecionado.foto)}
               alt={produtoSelecionado.nome}
             />
 
@@ -585,7 +585,7 @@ export default function PaginaAdministracao() {
           <div className="expanded-product-box">
             <div className="expanded-image">
               <img
-                src={produtoExpandido.foto || "/placeholder.png"}
+                src={imagemProdutoUrl(produtoExpandido.foto)}
                 alt={produtoExpandido.nome}
               />
             </div>
@@ -627,7 +627,7 @@ export default function PaginaAdministracao() {
               onClick={() => expandirProduto(produto)}
             >
               <img
-                src={produto.foto || "/placeholder.png"}
+                src={imagemProdutoUrl(produto.foto)}
                 alt={produto.nome}
               />
             </div>

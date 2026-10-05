@@ -1,6 +1,6 @@
 ﻿import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import api from "../services/server";
+import api, { imagemProdutoUrl } from "../services/server";
 
 import "../styles/exibProduto.css";
 
@@ -166,7 +166,7 @@ export default function ExibProduto() {
         <div className="product-image">
 
           <img
-            src={produto.foto || "/placeholder.png"}
+            src={imagemProdutoUrl(produto.foto)}
             alt={produto.nome}
             className="main-product-image"
             onClick={() => setZoomAtivo(true)}
@@ -331,7 +331,7 @@ export default function ExibProduto() {
           onClick={() => setZoomAtivo(false)}
         >
           <img
-            src={produto.foto || "/placeholder.png"}
+            src={imagemProdutoUrl(produto.foto)}
             alt={produto.nome}
             className="zoom-image"
           />
