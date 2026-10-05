@@ -91,6 +91,7 @@ routes.delete(
 routes.put(
   '/usuarios/email/:email',
   auth,
+  upload.single('fotoPerfil'),
   userController.atualizarPorEmail
 )
 
