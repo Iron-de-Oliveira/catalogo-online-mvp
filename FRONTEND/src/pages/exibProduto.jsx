@@ -245,7 +245,7 @@ export default function ExibProduto() {
               <strong>
 
                 {estoqueIndisponivel
-                  ? "Estoque indisponível."
+                  ? "Encomende este móvel. "
                   : "Estoque disponível."}
 
               </strong>
@@ -253,7 +253,7 @@ export default function ExibProduto() {
               <p>
 
                 {estoqueIndisponivel
-                  ? "Este produto está temporariamente fora de estoque."
+                  ? "Este produto está temporariamente fora de estoque. Entre em contato com nosso vendedor no whatsapp para encomendar."
                   : "Personalize a entrega com nosso vendedor no whatsapp."}
 
               </p>
