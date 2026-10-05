@@ -1,5 +1,51 @@
 const bcrypt = require('bcryptjs')
 const prisma = require('../config/prisma')
+const supabase = require('../config/supabase')
+
+async function salvarFotoPerfil(file, userId) {
+  const extensao = file.originalname.split('.').pop().toLowerCase()
+  const caminho = `perfis/${userId}/${Date.now()}-${Math.round(Math.random() * 1E9)}.${extensao}`
+
+  const { error } = await supabase.storage
+    .from('produtos')
+    .upload(caminho, file.buffer, {
+      contentType: file.mimetype,
+      cacheControl: '3600',
+      upsert: false
+    })
+
+  if (error) {
+    throw error
+  }
+
+  const { data } = supabase.storage
+    .from('produtos')
+    .getPublicUrl(caminho)
+
+  return data.publicUrl
+}
+
+async function excluirFotoPerfil(url, userId) {
+  const prefixo = '/storage/v1/object/public/produtos/perfis/'
+  const indice = url?.indexOf(prefixo) ?? -1
+
+  if (indice === -1) {
+    return
+  }
+
+  const caminho = url.slice(indice + prefixo.length)
+  if (!caminho.startsWith(`${userId}/`)) {
+    return
+  }
+
+  const { error } = await supabase.storage
+    .from('produtos')
+    .remove([`perfis/${caminho}`])
+
+  if (error) {
+    console.error('Erro ao remover foto de perfil antiga:', error)
+  }
+}
 
 class UserController {
   async encontrarPorId(req, res) {
@@ -10,7 +56,7 @@ class UserController {
 
       const usuario = await prisma.usuario.findUnique({
         where: { id: req.userId },
-        select: { id: true, nome: true, email: true }
+        select: { id: true, nome: true, email: true, fotoPerfil: true }
       })
 
       if (!usuario) {
@@ -27,7 +73,7 @@ class UserController {
     try {
       const usuario = await prisma.usuario.findUnique({
         where: { email: req.params.email.toLowerCase() },
-        select: { id: true, nome: true, email: true }
+        select: { id: true, nome: true, email: true, fotoPerfil: true }
       })
 
       if (!usuario) {
@@ -105,15 +151,30 @@ class UserController {
         dadosAtualizacao.email = novoEmail.trim().toLowerCase()
       }
 
+      if (req.file) {
+        dadosAtualizacao.fotoPerfil = await salvarFotoPerfil(req.file, req.userId)
+      }
+
       if (Object.keys(dadosAtualizacao).length === 0) {
         return res.status(400).json({ error: 'Informe ao menos um campo válido para atualizar.' })
       }
 
+      const usuarioAnterior = req.file
+        ? await prisma.usuario.findUnique({
+          where: { id: req.userId },
+          select: { fotoPerfil: true }
+        })
+        : null
+
       const usuarioAtualizado = await prisma.usuario.update({
         where: { id: req.userId },
         data: dadosAtualizacao,
-        select: { id: true, nome: true, email: true }
+        select: { id: true, nome: true, email: true, fotoPerfil: true }
       })
+
+      if (req.file) {
+        await excluirFotoPerfil(usuarioAnterior?.fotoPerfil, req.userId)
+      }
 
       return res.status(200).json(usuarioAtualizado)
     } catch (error) {
