@@ -105,6 +105,30 @@ export default function ExibProduto() {
     );
   }
 
+  // 🔵 NÚMERO DA LOJA - troque pelo número real (DDI + DDD + número, só dígitos)
+  const NUMERO_WHATSAPP_LOJA = "5563992679361"; // ex: 55 (Brasil) + DDD + número
+
+  function finalizarCompraWhatsapp() {
+    if (!produto) return;
+
+    const link = window.location.href;
+
+    const mensagem =
+      `Olá! Tenho interesse em comprar o seguinte produto:\n\n` +
+      `Produto: ${produto.nome}\n` +
+      `Valor: R$ ${precoAtual.toFixed(2)}\n` +
+      `Descrição: ${produto.descricao || "Sem descrição"}\n` +
+      (produto.categoria ? `Categoria: ${produto.categoria}\n` : "") +
+      `Link: ${link}\n\n` +
+      `Gostaria de obter mais informações sobre a compra.`;
+
+    const mensagemCodificada = encodeURIComponent(mensagem);
+
+    const urlWhatsapp = `https://wa.me/${NUMERO_WHATSAPP_LOJA}?text=${mensagemCodificada}`;
+
+    window.open(urlWhatsapp, "_blank");
+  }
+
   function compartilharProduto() {
     const link = window.location.href;
 
@@ -127,8 +151,8 @@ export default function ExibProduto() {
       {/* BOTÃO VOLTAR */}
 
       <button
-        className="back-button"
-        onClick={() => navigate(-1)}
+    className="back-button"
+  onClick={() => navigate("/")}
       >
         ❮
       </button>
@@ -182,7 +206,10 @@ export default function ExibProduto() {
                 Finalize sua compra pelo Whatsapp
               </p>
 
-              <button className="whatsapp-btn">
+              <button
+                className="whatsapp-btn"
+                onClick={finalizarCompraWhatsapp}
+              >
                 <img src="/whatsapp.png" alt="WhatsApp" />
               </button>
               <button
@@ -218,7 +245,7 @@ export default function ExibProduto() {
               <strong>
 
                 {estoqueIndisponivel
-                  ? "Estoque indisponível."
+                  ? "Encomende este móvel. "
                   : "Estoque disponível."}
 
               </strong>
@@ -226,7 +253,7 @@ export default function ExibProduto() {
               <p>
 
                 {estoqueIndisponivel
-                  ? "Este produto está temporariamente fora de estoque."
+                  ? "Este produto está temporariamente fora de estoque. Entre em contato com nosso vendedor no whatsapp para encomendar."
                   : "Personalize a entrega com nosso vendedor no whatsapp."}
 
               </p>

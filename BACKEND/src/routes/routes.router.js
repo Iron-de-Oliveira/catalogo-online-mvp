@@ -16,10 +16,8 @@ routes.get('/', (req, res) => {
   })
 })
 
-// Rotas para autenticação
 routes.use('/auth', authRoutes)
 
-// Rotas para administradores
 routes.post(
   '/administradores',
   auth,
@@ -27,23 +25,10 @@ routes.post(
   administradorController.criar
 )
 
-// Rotas para produtos
-routes.get(
-  '/produtos/id/:id',
-  produtoController.listarPorId
-)
+routes.get('/produtos/id/:id', produtoController.listarPorId)
+routes.get('/produtos/categoria/:categoria', produtoController.listarPorCategoria)
+routes.get('/produtos', produtoController.listar)
 
-routes.get(
-  '/produtos/categoria/:categoria',
-  produtoController.listarPorCategoria
-)
-
-routes.get(
-  '/produtos',
-  produtoController.listar
-)
-
-// Atualizar produto
 routes.put(
   '/produtos/id/:id',
   auth,
@@ -52,7 +37,6 @@ routes.put(
   produtoController.atualizar
 )
 
-// Criar produto
 routes.post(
   '/produtos',
   auth,
@@ -61,7 +45,6 @@ routes.post(
   produtoController.criar
 )
 
-// Deletar produto
 routes.delete(
   '/produtos/id/:id',
   auth,
@@ -69,25 +52,9 @@ routes.delete(
   produtoController.deletar
 )
 
-// Rotas para o próprio usuário autenticado
-routes.get(
-  '/usuarios/id/:id',
-  auth,
-  userController.encontrarPorId
-)
-
-routes.get(
-  '/usuarios/email/:email',
-  auth,
-  userController.encontrarPorEmail
-)
-
-routes.delete(
-  '/usuarios/email/:email',
-  auth,
-  userController.deletarPorEmail
-)
-
+routes.get('/usuarios/id/:id', auth, userController.encontrarPorId)
+routes.get('/usuarios/email/:email', auth, userController.encontrarPorEmail)
+routes.delete('/usuarios/email/:email', auth, userController.deletarPorEmail)
 routes.put(
   '/usuarios/email/:email',
   auth,

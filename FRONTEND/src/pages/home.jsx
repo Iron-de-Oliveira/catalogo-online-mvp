@@ -268,10 +268,20 @@ function Home() {
       <section className="hero">
         <div className="hero-text">
           <h1>
-            DURABILIDADE, CONFORTO <br />
-            E ESTILO DIRETO DA NATUREZA <br />
-            PARA SUA CASA.
+            Durabilidade, conforto <br />
+            e estilo direto da natureza <br />
+            para sua casa.
           </h1>
+
+          <button
+            onClick={() =>
+              document
+                .getElementById("vitrine")
+                ?.scrollIntoView({ behavior: "smooth" })
+            }
+          >
+            Ver Produtos
+          </button>
         </div>
       </section>
 
@@ -327,7 +337,7 @@ function Home() {
         )}
       </nav>
 
-      <section className="products-grid">
+      <section className="products-grid" id="vitrine">
         {loading ? (
           <div className="loading">
             Carregando produtos...

@@ -172,8 +172,7 @@ function PerfilUsuario() {
   return (
     <div className="perfil-container">
       <div className="perfil-topo">
-        <div className="perfil-info">
-           <div
+        <div className="perfil-info"> <div
           className="back-home"
           onClick={() => navigate("/")}
         >
@@ -198,8 +197,9 @@ function PerfilUsuario() {
           <p>Atualizar informações pessoais</p>
 
           <button
-            className="btn-atualizar"
-            onClick={() => setMostrarFormulario(true)}
+      
+    className="btn-atualizar"
+  onClick={() => setMostrarFormulario(true)}
           >
             Atualizar
           </button>
