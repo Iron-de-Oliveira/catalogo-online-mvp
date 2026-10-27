@@ -55,6 +55,11 @@ routes.delete(
 routes.get('/usuarios/id/:id', auth, userController.encontrarPorId)
 routes.get('/usuarios/email/:email', auth, userController.encontrarPorEmail)
 routes.delete('/usuarios/email/:email', auth, userController.deletarPorEmail)
-routes.put('/usuarios/email/:email', auth, userController.atualizarPorEmail)
+routes.put(
+  '/usuarios/email/:email',
+  auth,
+  upload.single('fotoPerfil'),
+  userController.atualizarPorEmail
+)
 
 module.exports = routes

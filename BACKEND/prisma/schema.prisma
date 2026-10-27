@@ -55,13 +55,15 @@ enum Categoria {
   QUARTO
   MESAS
   GUARDA_ROUPAS
+  CADEIRAS
   PECAS
   RUSTICO
 }
 model Usuario {
-  id        String   @id @default(uuid())
-  nome      String
-  email     String   @unique
-  senha     String
-  createdAt DateTime @default(now())
+  id          String   @id @default(uuid())
+  nome        String
+  email       String   @unique
+  senha       String
+  fotoPerfil  String?  @map("foto_perfil")
+  createdAt   DateTime @default(now())
 }
