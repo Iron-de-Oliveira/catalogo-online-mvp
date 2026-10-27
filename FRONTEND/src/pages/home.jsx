@@ -1,36 +1,74 @@
 import "../styles/style.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api, { baseURL } from "../services/server";
-
+import api, { imagemProdutoUrl } from "../services/server";
 
 function Home() {
   const navigate = useNavigate();
-
-  const [mostrarMaisCategorias, setMostrarMaisCategorias] = useState(false);
-
+  const menuRef = useRef(null);
+  const [mostrarFiltros, setMostrarFiltros] = useState(false);
   const [logado, setLogado] = useState(!!localStorage.getItem("token"));
-  const [usuario, setUsuario] = useState(null);
-
+  const [usuario, setUsuario] = useState(() => {
+    try {
+      const usuarioStorage = localStorage.getItem("usuario");
+      return usuarioStorage ? JSON.parse(usuarioStorage) : null;
+    } catch {
+      return null;
+    }
+  });
   const [produtos, setProdutos] = useState([]);
   const [produtosFiltrados, setProdutosFiltrados] = useState([]);
-
   const [busca, setBusca] = useState("");
   const [loading, setLoading] = useState(true);
+  const [filtros, setFiltros] = useState({ categoria: "" });
+
+  const categoriasDisponiveis = [
+    { valor: "sala", nome: "Sala" },
+    { valor: "cozinha", nome: "Cozinha" },
+    { valor: "decoracao", nome: "Decoração" },
+    { valor: "moveis", nome: "Móveis" },
+    { valor: "rustico", nome: "Rústicos" },
+    { valor: "pronta entrega", nome: "Pronta entrega" },
+  ];
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
     const usuarioStorage = localStorage.getItem("usuario");
 
-    if (usuarioStorage) {
-      setUsuario(JSON.parse(usuarioStorage));
+    if (token && usuarioStorage) {
+      try {
+        const usuarioSalvo = JSON.parse(usuarioStorage);
+        if (usuarioSalvo.id) {
+          api
+            .get(`/usuarios/id/${usuarioSalvo.id}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            })
+            .then(({ data }) => {
+              setUsuario(data);
+              localStorage.setItem("usuario", JSON.stringify(data));
+            })
+            .catch((error) => {
+              console.error("Erro ao atualizar dados do perfil:", error);
+            });
+        }
+      } catch (error) {
+        console.error("Dados locais do usuário inválidos:", error);
+        localStorage.removeItem("usuario");
+      }
+    } else if (usuarioStorage) {
+      try {
+        setUsuario(JSON.parse(usuarioStorage));
+      } catch {
+        localStorage.removeItem("usuario");
+      }
     }
 
     async function carregarProdutos() {
       try {
         const response = await api.get("/produtos");
-
-        setProdutos(response.data);
-        setProdutosFiltrados(response.data);
+        const lista = Array.isArray(response.data) ? response.data : [];
+        setProdutos(lista);
+        setProdutosFiltrados(lista);
       } catch (error) {
         console.error("Erro ao carregar produtos:", error);
       } finally {
@@ -39,6 +77,31 @@ function Home() {
     }
 
     carregarProdutos();
+  }, []);
+
+  // Fecha o menu quando clicar fora dele.
+  useEffect(() => {
+    function fecharAoClicarFora(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMostrarFiltros(false);
+      }
+    }
+
+    function fecharComEscape(event) {
+      if (event.key === "Escape") {
+        setMostrarFiltros(false);
+      }
+    }
+
+    document.addEventListener("mousedown", fecharAoClicarFora);
+    document.addEventListener("touchstart", fecharAoClicarFora);
+    document.addEventListener("keydown", fecharComEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", fecharAoClicarFora);
+      document.removeEventListener("touchstart", fecharAoClicarFora);
+      document.removeEventListener("keydown", fecharComEscape);
+    };
   }, []);
 
   function normalizarTexto(texto) {
@@ -50,104 +113,50 @@ function Home() {
       .trim();
   }
 
-  function gerarVariacoes(texto) {
-    const normalizado = normalizarTexto(texto);
+  function aplicarFiltros(termo = busca, categoria = filtros.categoria) {
+    const termoNormalizado = normalizarTexto(termo);
+    const categoriaNormalizada = normalizarTexto(categoria);
 
-    const variacoes = [normalizado];
+    const resultado = produtos.filter((produto) => {
+      const correspondeBusca =
+        !termoNormalizado ||
+        normalizarTexto(produto.nome).includes(termoNormalizado) ||
+        normalizarTexto(produto.categoria).includes(termoNormalizado) ||
+        normalizarTexto(produto.descricao).includes(termoNormalizado);
 
-    if (normalizado.endsWith("s")) {
-      variacoes.push(normalizado.slice(0, -1));
-    } else {
-      variacoes.push(`${normalizado}s`);
-    }
+      const correspondeCategoria =
+        !categoriaNormalizada ||
+        normalizarTexto(produto.categoria).includes(categoriaNormalizada);
 
-    const mapaSinonimos = {
-      cadeira: ["cadeira", "cadeiras"],
-      cadeiras: ["cadeira", "cadeiras"],
-
-      mesa: ["mesa", "mesas", "mesa de jantar", "mesas de jantar"],
-      mesas: ["mesa", "mesas", "mesa de jantar", "mesas de jantar"],
-
-      quarto: ["quarto", "quartos", "cama", "camas", "guarda roupa", "guarda roupas"],
-      quartos: ["quarto", "quartos", "cama", "camas", "guarda roupa", "guarda roupas"],
-
-      sala: ["sala", "salas", "sofa", "sofas", "mesa de centro"],
-      salas: ["sala", "salas", "sofa", "sofas", "mesa de centro"],
-
-      cozinha: ["cozinha", "cozinhas", "mesa", "mesas"],
-      cozinhas: ["cozinha", "cozinhas", "mesa", "mesas"],
-
-      decoracao: ["decoracao", "decoracoes", "decoração", "decorações", "vaso", "vasos"],
-      decoração: ["decoracao", "decoracoes", "decoração", "decorações", "vaso", "vasos"],
-
-      moveis: ["moveis", "móveis", "movel", "móvel"],
-      móveis: ["moveis", "móveis", "movel", "móvel"],
-
-      rustico: ["rustico", "rústico", "rusticos", "rústicos"],
-      rústico: ["rustico", "rústico", "rusticos", "rústicos"],
-
-      pecas: ["pecas", "peças", "peca", "peça"],
-      peças: ["pecas", "peças", "peca", "peça"]
-    };
-
-    if (mapaSinonimos[normalizado]) {
-      variacoes.push(...mapaSinonimos[normalizado]);
-    }
-
-    return [...new Set(variacoes.map((item) => normalizarTexto(item)))];
-  }
-
-  function textoCombina(valor, termoBusca) {
-    const valorNormalizado = normalizarTexto(valor);
-    const variacoesBusca = gerarVariacoes(termoBusca);
-
-    return variacoesBusca.some((termo) =>
-      valorNormalizado.includes(termo)
-    );
-  }
-
-  function pesquisarProdutos() {
-    const termo = busca.trim();
-
-    if (termo === "") {
-      setProdutosFiltrados(produtos);
-      return;
-    }
-
-    const filtrados = produtos.filter((produto) => {
-      return (
-        textoCombina(produto.nome, termo) ||
-        textoCombina(produto.categoria, termo) ||
-        textoCombina(produto.descricao, termo)
-      );
+      return correspondeBusca && correspondeCategoria;
     });
 
-    setProdutosFiltrados(filtrados);
+    setProdutosFiltrados(resultado);
   }
 
-  function filtrarPorAtalho(termo) {
-    const filtrados = produtos.filter((produto) => {
-      return (
-        textoCombina(produto.nome, termo) ||
-        textoCombina(produto.categoria, termo) ||
-        textoCombina(produto.descricao, termo)
-      );
-    });
-
-    setBusca(termo);
-    setProdutosFiltrados(filtrados);
+  function filtrarPorCategoria(valor) {
+    setBusca("");
+    setFiltros({ categoria: valor });
+    aplicarFiltros("", valor);
+    setMostrarFiltros(false);
   }
 
   function mostrarTodosProdutos() {
     setBusca("");
+    setFiltros({ categoria: "" });
     setProdutosFiltrados(produtos);
+    setMostrarFiltros(false);
+  }
+
+  function pesquisarProdutos() {
+    aplicarFiltros();
   }
 
   function limparPesquisaSeVazio(valor) {
     setBusca(valor);
 
     if (valor.trim() === "") {
-      setProdutosFiltrados(produtos);
+      aplicarFiltros("", filtros.categoria);
     }
   }
 
@@ -155,7 +164,6 @@ function Home() {
     if (logado) {
       localStorage.removeItem("token");
       localStorage.removeItem("usuario");
-
       setLogado(false);
       setUsuario(null);
       return;
@@ -171,23 +179,6 @@ function Home() {
   function irParaPerfil() {
     navigate("/perfil");
   }
-  function filtrarPorAtalho(termo) {
-    const filtrados = produtos.filter((produto) => {
-      return (
-        textoCombina(produto.nome, termo) ||
-        textoCombina(produto.categoria, termo) ||
-        textoCombina(produto.descricao, termo)
-      );
-    });
-
-    setBusca(termo);
-    setProdutosFiltrados(filtrados);
-  }
-
-  function mostrarTodosProdutos() {
-    setBusca("");
-    setProdutosFiltrados(produtos);
-  }
 
   return (
     <div className="home-container">
@@ -197,8 +188,16 @@ function Home() {
           <h2>Arte em móveis</h2>
         </div>
 
-        <div className="search-bar">
-          <span className="menu-icon">☰</span>
+        <div className="search-bar" ref={menuRef}>
+          <button
+            type="button"
+            className="menu-icon"
+            aria-label="Abrir categorias"
+            aria-expanded={mostrarFiltros}
+            onClick={() => setMostrarFiltros((aberto) => !aberto)}
+          >
+            ☰
+          </button>
 
           <input
             type="text"
@@ -206,9 +205,7 @@ function Home() {
             value={busca}
             onChange={(e) => limparPesquisaSeVazio(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                pesquisarProdutos();
-              }
+              if (e.key === "Enter") pesquisarProdutos();
             }}
           />
 
@@ -216,15 +213,49 @@ function Home() {
             className="search-icon"
             type="button"
             onClick={pesquisarProdutos}
+            aria-label="Pesquisar produtos"
           >
             🔍
           </button>
+
+          {mostrarFiltros && (
+            <div className="category-menu">
+              <h3>Categorias</h3>
+
+              <button
+                type="button"
+                className="category-menu-item"
+                onClick={mostrarTodosProdutos}
+              >
+                Todas as categorias
+              </button>
+
+              {categoriasDisponiveis.map((categoria) => (
+                <button
+                  type="button"
+                  className="category-menu-item"
+                  key={categoria.valor}
+                  onClick={() => filtrarPorCategoria(categoria.valor)}
+                >
+                  {categoria.nome}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="header-actions">
           {logado && usuario && (
             <button className="perfil-btn" onClick={irParaPerfil}>
-              <span className="perfil-icon">👤</span>
+              {usuario.fotoPerfil ? (
+                <img
+                  className="perfil-avatar"
+                  src={imagemProdutoUrl(usuario.fotoPerfil)}
+                  alt=""
+                />
+              ) : (
+                <span className="perfil-icon" aria-hidden="true">👤</span>
+              )}
               <span>Perfil</span>
             </button>
           )}
@@ -255,72 +286,18 @@ function Home() {
         </div>
       </section>
 
-      <nav className="categories-container">
-        <div className="categories">
-          <button onClick={mostrarTodosProdutos}>
-            PRONTA ENTREGA ▼
-          </button>
-
-          <button onClick={() => filtrarPorAtalho("mesa")}>
-            MESAS DE JANTAR ▼
-          </button>
-
-          <button onClick={() => filtrarPorAtalho("quarto")}>
-            QUARTO ▼
-          </button>
-
-          <button onClick={() => filtrarPorAtalho("cadeira")}>
-            CADEIRAS ▼
-          </button>
-
-          <button
-            onClick={() =>
-              setMostrarMaisCategorias(!mostrarMaisCategorias)
-            }
-          >
-            + CATEGORIAS
-          </button>
-        </div>
-
-        {mostrarMaisCategorias && (
-          <div className="extra-categories">
-            <button onClick={() => filtrarPorAtalho("sala")}>
-              SALA
-            </button>
-
-            <button onClick={() => filtrarPorAtalho("cozinha")}>
-              COZINHA
-            </button>
-
-            <button onClick={() => filtrarPorAtalho("decoracao")}>
-              DECORAÇÃO
-            </button>
-
-            <button onClick={() => filtrarPorAtalho("moveis")}>
-              MÓVEIS
-            </button>
-
-            <button onClick={() => filtrarPorAtalho("rustico")}>
-              RÚSTICOS
-            </button>
-          </div>
-        )}
-      </nav>
-
       <section className="products-grid" id="vitrine">
         {loading ? (
-          <div className="loading">
-            Carregando produtos...
-          </div>
+          <div className="loading">Carregando produtos...</div>
         ) : produtosFiltrados.length === 0 ? (
           <div className="no-products">
-            Nenhum produto encontrado para essa pesquisa.
+            Nenhum produto encontrado para esses critérios.
           </div>
         ) : (
           produtosFiltrados.map((produto) => (
             <div className="product-card" key={produto.id}>
               <img
-                 src={produto.foto || "/placeholder.png"}
+                src={imagemProdutoUrl(produto.foto)}
                 alt={produto.nome}
                 onClick={() => irParaProduto(produto.id)}
                 className="clickable-product"
@@ -331,10 +308,7 @@ function Home() {
               </div>
 
               <div className="product-footer">
-                <span>
-                  R$ {Number(produto.preco).toFixed(2)}
-                </span>
-
+                <span>R$ {Number(produto.preco).toFixed(2)}</span>
                 <button onClick={() => irParaProduto(produto.id)}>
                   Ver Mais
                 </button>

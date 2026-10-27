@@ -33,6 +33,25 @@ body {
   padding: 40px 24px 120px;
 }
 
+.btn-home-back {
+  position: absolute;
+  top: 20px;
+  left: 24px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid #00384a;
+  border-radius: 4px;
+  background: #fff;
+  color: #00384a;
+  cursor: pointer;
+  font-family: Georgia, serif;
+  font-size: 15px;
+}
+
+.btn-home-back:hover {
+  background: #e8f4f5;
+}
+
 .left-side h1 {
   font-size: clamp(32px, 4vw, 46px);
   margin-bottom: clamp(40px, 7vh, 85px);
@@ -188,6 +207,20 @@ body {
   border: 1px solid #777;
   margin-bottom: 10px;
   font-size: 15px;
+}
+
+.form-container input[aria-invalid="true"] {
+  border-color: #dc2626;
+  outline: 2px solid rgba(220, 38, 38, .18);
+}
+
+.field-error {
+  width: 100%;
+  margin: -4px 0 8px;
+  color: #b91c1c;
+  font-size: 14px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .buttons {

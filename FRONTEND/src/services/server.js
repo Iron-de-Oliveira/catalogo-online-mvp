@@ -10,3 +10,15 @@ const api = axios.create({
 export { baseURL };
 export default api;
 
+export function imagemProdutoUrl(foto) {
+  if (!foto) {
+    return "/placeholder.png";
+  }
+
+  if (/^https?:\/\//i.test(foto)) {
+    return foto;
+  }
+
+  return `${baseURL.replace(/\/$/, "")}/${foto.replace(/^\/+/, "")}`;
+}
+
