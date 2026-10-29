@@ -1,14 +1,12 @@
 import "../styles/style.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api, { imagemProdutoUrl } from "../services/server";
 
-
 function Home() {
   const navigate = useNavigate();
-
-  const [mostrarMaisCategorias, setMostrarMaisCategorias] = useState(false);
-
+  const menuRef = useRef(null);
+  const [mostrarFiltros, setMostrarFiltros] = useState(false);
   const [logado, setLogado] = useState(!!localStorage.getItem("token"));
   const [usuario, setUsuario] = useState(() => {
     try {
@@ -18,12 +16,20 @@ function Home() {
       return null;
     }
   });
-
   const [produtos, setProdutos] = useState([]);
   const [produtosFiltrados, setProdutosFiltrados] = useState([]);
-
   const [busca, setBusca] = useState("");
   const [loading, setLoading] = useState(true);
+  const [filtros, setFiltros] = useState({ categoria: "" });
+
+  const categoriasDisponiveis = [
+    { valor: "sala", nome: "Sala" },
+    { valor: "cozinha", nome: "Cozinha" },
+    { valor: "decoracao", nome: "Decoração" },
+    { valor: "moveis", nome: "Móveis" },
+    { valor: "rustico", nome: "Rústicos" },
+    { valor: "pronta entrega", nome: "Pronta entrega" },
+  ];
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -33,26 +39,36 @@ function Home() {
       try {
         const usuarioSalvo = JSON.parse(usuarioStorage);
         if (usuarioSalvo.id) {
-          api.get(`/usuarios/id/${usuarioSalvo.id}`, {
-            headers: { Authorization: `Bearer ${token}` }
-          }).then(({ data }) => {
-            setUsuario(data);
-            localStorage.setItem("usuario", JSON.stringify(data));
-          }).catch((error) => {
-            console.error("Erro ao atualizar dados do perfil:", error);
-          });
+          api
+            .get(`/usuarios/id/${usuarioSalvo.id}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            })
+            .then(({ data }) => {
+              setUsuario(data);
+              localStorage.setItem("usuario", JSON.stringify(data));
+            })
+            .catch((error) => {
+              console.error("Erro ao atualizar dados do perfil:", error);
+            });
         }
       } catch (error) {
         console.error("Dados locais do usuário inválidos:", error);
+        localStorage.removeItem("usuario");
+      }
+    } else if (usuarioStorage) {
+      try {
+        setUsuario(JSON.parse(usuarioStorage));
+      } catch {
+        localStorage.removeItem("usuario");
       }
     }
 
     async function carregarProdutos() {
       try {
         const response = await api.get("/produtos");
-
-        setProdutos(response.data);
-        setProdutosFiltrados(response.data);
+        const lista = Array.isArray(response.data) ? response.data : [];
+        setProdutos(lista);
+        setProdutosFiltrados(lista);
       } catch (error) {
         console.error("Erro ao carregar produtos:", error);
       } finally {
@@ -61,6 +77,31 @@ function Home() {
     }
 
     carregarProdutos();
+  }, []);
+
+  // Fecha o menu quando clicar fora dele.
+  useEffect(() => {
+    function fecharAoClicarFora(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMostrarFiltros(false);
+      }
+    }
+
+    function fecharComEscape(event) {
+      if (event.key === "Escape") {
+        setMostrarFiltros(false);
+      }
+    }
+
+    document.addEventListener("mousedown", fecharAoClicarFora);
+    document.addEventListener("touchstart", fecharAoClicarFora);
+    document.addEventListener("keydown", fecharComEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", fecharAoClicarFora);
+      document.removeEventListener("touchstart", fecharAoClicarFora);
+      document.removeEventListener("keydown", fecharComEscape);
+    };
   }, []);
 
   function normalizarTexto(texto) {
@@ -139,29 +180,29 @@ function Home() {
   navigate(`/busca?q=${encodeURIComponent(termo)}`);
 }
 
-  function filtrarPorAtalho(termo) {
-    const filtrados = produtos.filter((produto) => {
-      return (
-        textoCombina(produto.nome, termo) ||
-        textoCombina(produto.categoria, termo) ||
-        textoCombina(produto.descricao, termo)
-      );
-    });
-
-    setBusca(termo);
-    setProdutosFiltrados(filtrados);
+  function filtrarPorCategoria(valor) {
+    setBusca("");
+    setFiltros({ categoria: valor });
+    aplicarFiltros("", valor);
+    setMostrarFiltros(false);
   }
 
   function mostrarTodosProdutos() {
     setBusca("");
+    setFiltros({ categoria: "" });
     setProdutosFiltrados(produtos);
+    setMostrarFiltros(false);
+  }
+
+  function pesquisarProdutos() {
+    aplicarFiltros();
   }
 
   function limparPesquisaSeVazio(valor) {
     setBusca(valor);
 
     if (valor.trim() === "") {
-      setProdutosFiltrados(produtos);
+      aplicarFiltros("", filtros.categoria);
     }
   }
 
@@ -169,7 +210,6 @@ function Home() {
     if (logado) {
       localStorage.removeItem("token");
       localStorage.removeItem("usuario");
-
       setLogado(false);
       setUsuario(null);
       return;
@@ -185,23 +225,6 @@ function Home() {
   function irParaPerfil() {
     navigate("/perfil");
   }
-  function filtrarPorAtalho(termo) {
-    const filtrados = produtos.filter((produto) => {
-      return (
-        textoCombina(produto.nome, termo) ||
-        textoCombina(produto.categoria, termo) ||
-        textoCombina(produto.descricao, termo)
-      );
-    });
-
-    setBusca(termo);
-    setProdutosFiltrados(filtrados);
-  }
-
-  function mostrarTodosProdutos() {
-    setBusca("");
-    setProdutosFiltrados(produtos);
-  }
 
   return (
     <div className="home-container">
@@ -211,8 +234,16 @@ function Home() {
           <h2>Arte em móveis</h2>
         </div>
 
-        <div className="search-bar">
-          <span className="menu-icon">☰</span>
+        <div className="search-bar" ref={menuRef}>
+          <button
+            type="button"
+            className="menu-icon"
+            aria-label="Abrir categorias"
+            aria-expanded={mostrarFiltros}
+            onClick={() => setMostrarFiltros((aberto) => !aberto)}
+          >
+            ☰
+          </button>
 
           <input
             type="text"
@@ -220,9 +251,7 @@ function Home() {
             value={busca}
             onChange={(e) => limparPesquisaSeVazio(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                pesquisarProdutos();
-              }
+              if (e.key === "Enter") pesquisarProdutos();
             }}
           />
 
@@ -230,9 +259,35 @@ function Home() {
             className="search-icon"
             type="button"
             onClick={pesquisarProdutos}
+            aria-label="Pesquisar produtos"
           >
             🔍
           </button>
+
+          {mostrarFiltros && (
+            <div className="category-menu">
+              <h3>Categorias</h3>
+
+              <button
+                type="button"
+                className="category-menu-item"
+                onClick={mostrarTodosProdutos}
+              >
+                Todas as categorias
+              </button>
+
+              {categoriasDisponiveis.map((categoria) => (
+                <button
+                  type="button"
+                  className="category-menu-item"
+                  key={categoria.valor}
+                  onClick={() => filtrarPorCategoria(categoria.valor)}
+                >
+                  {categoria.nome}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="header-actions">
@@ -277,66 +332,12 @@ function Home() {
         </div>
       </section>
 
-      <nav className="categories-container">
-        <div className="categories">
-          <button onClick={mostrarTodosProdutos}>
-            PRONTA ENTREGA ▼
-          </button>
-
-          <button onClick={() => filtrarPorAtalho("mesa")}>
-            MESAS DE JANTAR ▼
-          </button>
-
-          <button onClick={() => filtrarPorAtalho("quarto")}>
-            QUARTO ▼
-          </button>
-
-          <button onClick={() => filtrarPorAtalho("cadeira")}>
-            CADEIRAS ▼
-          </button>
-
-          <button
-            onClick={() =>
-              setMostrarMaisCategorias(!mostrarMaisCategorias)
-            }
-          >
-            + CATEGORIAS
-          </button>
-        </div>
-
-        {mostrarMaisCategorias && (
-          <div className="extra-categories">
-            <button onClick={() => filtrarPorAtalho("sala")}>
-              SALA
-            </button>
-
-            <button onClick={() => filtrarPorAtalho("cozinha")}>
-              COZINHA
-            </button>
-
-            <button onClick={() => filtrarPorAtalho("decoracao")}>
-              DECORAÇÃO
-            </button>
-
-            <button onClick={() => filtrarPorAtalho("moveis")}>
-              MÓVEIS
-            </button>
-
-            <button onClick={() => filtrarPorAtalho("rustico")}>
-              RÚSTICOS
-            </button>
-          </div>
-        )}
-      </nav>
-
       <section className="products-grid" id="vitrine">
         {loading ? (
-          <div className="loading">
-            Carregando produtos...
-          </div>
+          <div className="loading">Carregando produtos...</div>
         ) : produtosFiltrados.length === 0 ? (
           <div className="no-products">
-            Nenhum produto encontrado para essa pesquisa.
+            Nenhum produto encontrado para esses critérios.
           </div>
         ) : (
           produtosFiltrados.map((produto) => (
@@ -353,10 +354,7 @@ function Home() {
               </div>
 
               <div className="product-footer">
-                <span>
-                  R$ {Number(produto.preco).toFixed(2)}
-                </span>
-
+                <span>R$ {Number(produto.preco).toFixed(2)}</span>
                 <button onClick={() => irParaProduto(produto.id)}>
                   Ver Mais
                 </button>
