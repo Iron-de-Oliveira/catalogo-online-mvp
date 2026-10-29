@@ -129,23 +129,15 @@ function Home() {
   }
 
   function pesquisarProdutos() {
-    const termo = busca.trim();
+  const termo = busca.trim();
 
-    if (termo === "") {
-      setProdutosFiltrados(produtos);
-      return;
-    }
-
-    const filtrados = produtos.filter((produto) => {
-      return (
-        textoCombina(produto.nome, termo) ||
-        textoCombina(produto.categoria, termo) ||
-        textoCombina(produto.descricao, termo)
-      );
-    });
-
-    setProdutosFiltrados(filtrados);
+  if (termo === "") {
+    setProdutosFiltrados(produtos);
+    return;
   }
+
+  navigate(`/busca?q=${encodeURIComponent(termo)}`);
+}
 
   function filtrarPorAtalho(termo) {
     const filtrados = produtos.filter((produto) => {
