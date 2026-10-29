@@ -113,26 +113,72 @@ function Home() {
       .trim();
   }
 
-  function aplicarFiltros(termo = busca, categoria = filtros.categoria) {
-    const termoNormalizado = normalizarTexto(termo);
-    const categoriaNormalizada = normalizarTexto(categoria);
+  function gerarVariacoes(texto) {
+    const normalizado = normalizarTexto(texto);
 
-    const resultado = produtos.filter((produto) => {
-      const correspondeBusca =
-        !termoNormalizado ||
-        normalizarTexto(produto.nome).includes(termoNormalizado) ||
-        normalizarTexto(produto.categoria).includes(termoNormalizado) ||
-        normalizarTexto(produto.descricao).includes(termoNormalizado);
+    const variacoes = [normalizado];
 
-      const correspondeCategoria =
-        !categoriaNormalizada ||
-        normalizarTexto(produto.categoria).includes(categoriaNormalizada);
+    if (normalizado.endsWith("s")) {
+      variacoes.push(normalizado.slice(0, -1));
+    } else {
+      variacoes.push(`${normalizado}s`);
+    }
 
-      return correspondeBusca && correspondeCategoria;
-    });
+    const mapaSinonimos = {
+      cadeira: ["cadeira", "cadeiras"],
+      cadeiras: ["cadeira", "cadeiras"],
 
-    setProdutosFiltrados(resultado);
+      mesa: ["mesa", "mesas", "mesa de jantar", "mesas de jantar"],
+      mesas: ["mesa", "mesas", "mesa de jantar", "mesas de jantar"],
+
+      quarto: ["quarto", "quartos", "cama", "camas", "guarda roupa", "guarda roupas"],
+      quartos: ["quarto", "quartos", "cama", "camas", "guarda roupa", "guarda roupas"],
+
+      sala: ["sala", "salas", "sofa", "sofas", "mesa de centro"],
+      salas: ["sala", "salas", "sofa", "sofas", "mesa de centro"],
+
+      cozinha: ["cozinha", "cozinhas", "mesa", "mesas"],
+      cozinhas: ["cozinha", "cozinhas", "mesa", "mesas"],
+
+      decoracao: ["decoracao", "decoracoes", "decoração", "decorações", "vaso", "vasos"],
+      decoração: ["decoracao", "decoracoes", "decoração", "decorações", "vaso", "vasos"],
+
+      moveis: ["moveis", "móveis", "movel", "móvel"],
+      móveis: ["moveis", "móveis", "movel", "móvel"],
+
+      rustico: ["rustico", "rústico", "rusticos", "rústicos"],
+      rústico: ["rustico", "rústico", "rusticos", "rústicos"],
+
+      pecas: ["pecas", "peças", "peca", "peça"],
+      peças: ["pecas", "peças", "peca", "peça"]
+    };
+
+    if (mapaSinonimos[normalizado]) {
+      variacoes.push(...mapaSinonimos[normalizado]);
+    }
+
+    return [...new Set(variacoes.map((item) => normalizarTexto(item)))];
   }
+
+  function textoCombina(valor, termoBusca) {
+    const valorNormalizado = normalizarTexto(valor);
+    const variacoesBusca = gerarVariacoes(termoBusca);
+
+    return variacoesBusca.some((termo) =>
+      valorNormalizado.includes(termo)
+    );
+  }
+
+  function pesquisarProdutos() {
+  const termo = busca.trim();
+
+  if (termo === "") {
+    setProdutosFiltrados(produtos);
+    return;
+  }
+
+  navigate(`/busca?q=${encodeURIComponent(termo)}`);
+}
 
   function filtrarPorCategoria(valor) {
     setBusca("");
