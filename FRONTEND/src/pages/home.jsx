@@ -2,6 +2,7 @@ import "../styles/style.css";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api, { imagemProdutoUrl } from "../services/server";
+import { filtrarProdutos, normalizarTexto } from "../utils/busca";
 
 function Home() {
   const navigate = useNavigate();
@@ -104,81 +105,16 @@ function Home() {
     };
   }, []);
 
-  function normalizarTexto(texto) {
-    return String(texto || "")
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/_/g, " ")
-      .trim();
-  }
-
-  function gerarVariacoes(texto) {
-    const normalizado = normalizarTexto(texto);
-
-    const variacoes = [normalizado];
-
-    if (normalizado.endsWith("s")) {
-      variacoes.push(normalizado.slice(0, -1));
-    } else {
-      variacoes.push(`${normalizado}s`);
-    }
-
-    const mapaSinonimos = {
-      cadeira: ["cadeira", "cadeiras"],
-      cadeiras: ["cadeira", "cadeiras"],
-
-      mesa: ["mesa", "mesas", "mesa de jantar", "mesas de jantar"],
-      mesas: ["mesa", "mesas", "mesa de jantar", "mesas de jantar"],
-
-      quarto: ["quarto", "quartos", "cama", "camas", "guarda roupa", "guarda roupas"],
-      quartos: ["quarto", "quartos", "cama", "camas", "guarda roupa", "guarda roupas"],
-
-      sala: ["sala", "salas", "sofa", "sofas", "mesa de centro"],
-      salas: ["sala", "salas", "sofa", "sofas", "mesa de centro"],
-
-      cozinha: ["cozinha", "cozinhas", "mesa", "mesas"],
-      cozinhas: ["cozinha", "cozinhas", "mesa", "mesas"],
-
-      decoracao: ["decoracao", "decoracoes", "decoração", "decorações", "vaso", "vasos"],
-      decoração: ["decoracao", "decoracoes", "decoração", "decorações", "vaso", "vasos"],
-
-      moveis: ["moveis", "móveis", "movel", "móvel"],
-      móveis: ["moveis", "móveis", "movel", "móvel"],
-
-      rustico: ["rustico", "rústico", "rusticos", "rústicos"],
-      rústico: ["rustico", "rústico", "rusticos", "rústicos"],
-
-      pecas: ["pecas", "peças", "peca", "peça"],
-      peças: ["pecas", "peças", "peca", "peça"]
-    };
-
-    if (mapaSinonimos[normalizado]) {
-      variacoes.push(...mapaSinonimos[normalizado]);
-    }
-
-    return [...new Set(variacoes.map((item) => normalizarTexto(item)))];
-  }
-
-  function textoCombina(valor, termoBusca) {
-    const valorNormalizado = normalizarTexto(valor);
-    const variacoesBusca = gerarVariacoes(termoBusca);
-
-    return variacoesBusca.some((termo) =>
-      valorNormalizado.includes(termo)
+  function aplicarFiltros(termo = busca, categoria = filtros.categoria) {
+    const categoriaNormalizada = normalizarTexto(categoria);
+    const resultado = filtrarProdutos(produtos, termo).filter(
+      (produto) =>
+        !categoriaNormalizada ||
+        normalizarTexto(produto.categoria).includes(categoriaNormalizada)
     );
+
+    setProdutosFiltrados(resultado);
   }
-
-  function pesquisarProdutos() {
-  const termo = busca.trim();
-
-  if (termo === "") {
-    setProdutosFiltrados(produtos);
-    return;
-  }
-
-  navigate(`/busca?q=${encodeURIComponent(termo)}`);
-}
 
   function filtrarPorCategoria(valor) {
     setBusca("");
@@ -195,7 +131,14 @@ function Home() {
   }
 
   function pesquisarProdutos() {
-    aplicarFiltros();
+    const termo = busca.trim();
+
+    if (!termo) {
+      aplicarFiltros("", filtros.categoria);
+      return;
+    }
+
+    navigate(`/busca?q=${encodeURIComponent(termo)}`);
   }
 
   function limparPesquisaSeVazio(valor) {
