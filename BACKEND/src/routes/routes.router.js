@@ -33,7 +33,10 @@ routes.put(
   '/produtos/id/:id',
   auth,
   admin,
-  upload.single('foto'),
+  upload.fields([
+    { name: 'foto', maxCount: 1 },
+    { name: 'fotos', maxCount: 10 }
+  ]),
   produtoController.atualizar
 )
 
@@ -41,7 +44,10 @@ routes.post(
   '/produtos',
   auth,
   admin,
-  upload.single('foto'),
+  upload.fields([
+    { name: 'foto', maxCount: 1 },
+    { name: 'fotos', maxCount: 10 }
+  ]),
   produtoController.criar
 )
 
