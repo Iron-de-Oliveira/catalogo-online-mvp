@@ -2,6 +2,7 @@ import "../styles/style.css";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api, { imagemProdutoUrl } from "../services/server";
+import { filtrarProdutos, normalizarTexto } from "../utils/busca";
 
 function Home() {
   const navigate = useNavigate();
@@ -104,32 +105,13 @@ function Home() {
     };
   }, []);
 
-  function normalizarTexto(texto) {
-    return String(texto || "")
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/_/g, " ")
-      .trim();
-  }
-
   function aplicarFiltros(termo = busca, categoria = filtros.categoria) {
-    const termoNormalizado = normalizarTexto(termo);
     const categoriaNormalizada = normalizarTexto(categoria);
-
-    const resultado = produtos.filter((produto) => {
-      const correspondeBusca =
-        !termoNormalizado ||
-        normalizarTexto(produto.nome).includes(termoNormalizado) ||
-        normalizarTexto(produto.categoria).includes(termoNormalizado) ||
-        normalizarTexto(produto.descricao).includes(termoNormalizado);
-
-      const correspondeCategoria =
+    const resultado = filtrarProdutos(produtos, termo).filter(
+      (produto) =>
         !categoriaNormalizada ||
-        normalizarTexto(produto.categoria).includes(categoriaNormalizada);
-
-      return correspondeBusca && correspondeCategoria;
-    });
+        normalizarTexto(produto.categoria).includes(categoriaNormalizada)
+    );
 
     setProdutosFiltrados(resultado);
   }
@@ -149,7 +131,14 @@ function Home() {
   }
 
   function pesquisarProdutos() {
-    aplicarFiltros();
+    const termo = busca.trim();
+
+    if (!termo) {
+      aplicarFiltros("", filtros.categoria);
+      return;
+    }
+
+    navigate(`/busca?q=${encodeURIComponent(termo)}`);
   }
 
   function limparPesquisaSeVazio(valor) {
