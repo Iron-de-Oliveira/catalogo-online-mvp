@@ -124,3 +124,16 @@ O npm install instala todas as dependências do package.json
 Sempre rodar os comandos dentro da pasta BACKEND
 O banco de dados deve estar rodando (PostgreSQL ou Docker)
 Não versionar .env
+
+## Várias fotos por produto
+
+As rotas `POST /produtos` e `PUT /produtos/id/:id` aceitam imagens em
+`multipart/form-data`. Envie até 10 arquivos repetindo o campo `fotos`.
+O campo legado `foto` continua aceito para manter compatibilidade: na criação
+ele também pode ser usado como a única imagem; na atualização, substitui a foto
+principal. Enviar `fotos` durante a atualização adiciona imagens à galeria.
+
+As respostas mantêm `foto` como URL da imagem principal e incluem `fotos`,
+uma lista ordenada de objetos com `id`, `url`, `ordem` e `produtoId`. A migration
+`20261112230000_add_multiple_product_images` cria a tabela de imagens e copia
+para ela a foto principal dos produtos já cadastrados.

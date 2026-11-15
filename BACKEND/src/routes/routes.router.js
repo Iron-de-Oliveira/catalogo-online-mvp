@@ -33,7 +33,10 @@ routes.put(
   '/produtos/id/:id',
   auth,
   admin,
-  upload.single('foto'),
+  upload.fields([
+    { name: 'foto', maxCount: 1 },
+    { name: 'fotos', maxCount: 10 }
+  ]),
   produtoController.atualizar
 )
 
@@ -41,7 +44,10 @@ routes.post(
   '/produtos',
   auth,
   admin,
-  upload.single('foto'),
+  upload.fields([
+    { name: 'foto', maxCount: 1 },
+    { name: 'fotos', maxCount: 10 }
+  ]),
   produtoController.criar
 )
 
@@ -55,6 +61,11 @@ routes.delete(
 routes.get('/usuarios/id/:id', auth, userController.encontrarPorId)
 routes.get('/usuarios/email/:email', auth, userController.encontrarPorEmail)
 routes.delete('/usuarios/email/:email', auth, userController.deletarPorEmail)
-routes.put('/usuarios/email/:email', auth, userController.atualizarPorEmail)
+routes.put(
+  '/usuarios/email/:email',
+  auth,
+  upload.single('fotoPerfil'),
+  userController.atualizarPorEmail
+)
 
 module.exports = routes
