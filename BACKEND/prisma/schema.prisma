@@ -45,8 +45,20 @@ model Produto {
 
   administradorId Int           @map("id_administrador")
   administrador   Administrador @relation(fields: [administradorId], references: [id])
+  fotos           ProdutoImagem[]
 
   @@map("produtos")
+}
+
+model ProdutoImagem {
+  id        Int      @id @default(autoincrement()) @map("id_imagem")
+  url       String   @db.VarChar(500)
+  ordem     Int
+  produtoId Int      @map("id_produto")
+  produto   Produto  @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+
+  @@index([produtoId, ordem])
+  @@map("produto_imagens")
 }
 
 enum Categoria {

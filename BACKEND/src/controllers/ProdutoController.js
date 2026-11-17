@@ -54,12 +54,40 @@ const excluirImagemSupabase = async (url) => {
   }
 }
 
+const obterArquivos = (req) => [
+  ...(req.files?.foto || []),
+  ...(req.files?.fotos || [])
+]
+
+const uploadImagens = async (arquivos) => {
+  const urls = []
+
+  try {
+    for (const arquivo of arquivos) {
+      urls.push(await uploadImagem(arquivo))
+    }
+
+    return urls
+  } catch (error) {
+    await Promise.all(urls.map(excluirImagemSupabase))
+    throw error
+  }
+}
+
+const incluirFotos = {
+  fotos: {
+    orderBy: { ordem: 'asc' }
+  }
+}
+
 class ProdutoController {
 
   // listar todos os produtos cadastrados
   async listar(req, res) {
     try {
-      const produtos = await prisma.produto.findMany()
+      const produtos = await prisma.produto.findMany({
+        include: incluirFotos
+      })
 
       return res.status(200).json(produtos)
 
@@ -97,31 +125,54 @@ class ProdutoController {
         })
       }
 
-      const fotoUrl = await uploadImagem(req.file)
+      const arquivos = obterArquivos(req)
 
-      const produto = await prisma.produto.create({
-        data: {
-          nome,
+      if (!arquivos.length) {
+        return res.status(400).json({
+          error: 'Envie pelo menos uma foto do produto.'
+        })
+      }
 
-          categoria: categoria.toUpperCase(),
+      if (arquivos.length > 10) {
+        return res.status(400).json({
+          error: 'Envie no máximo 10 fotos por produto.'
+        })
+      }
 
-          estoque: parseInt(estoque),
+      const urls = await uploadImagens(arquivos)
 
-          descricao,
+      try {
+        const produto = await prisma.produto.create({
+          data: {
+            nome,
 
-          preco: parseFloat(preco),
+            categoria: categoria.toUpperCase(),
 
-          foto: fotoUrl,
+            estoque: parseInt(estoque),
 
-          administrador: {
-            connect: {
-              id: Number(req.userId)
+            descricao,
+
+            preco: parseFloat(preco),
+
+            foto: urls[0],
+            fotos: {
+              create: urls.map((url, ordem) => ({ url, ordem }))
+            },
+
+            administrador: {
+              connect: {
+                id: Number(req.userId)
+              }
             }
-          }
-        }
-      })
+          },
+          include: incluirFotos
+        })
 
-      return res.status(201).json(produto)
+        return res.status(201).json(produto)
+      } catch (error) {
+        await Promise.all(urls.map(excluirImagemSupabase))
+        throw error
+      }
 
     } catch (error) {
 
@@ -142,7 +193,8 @@ class ProdutoController {
       const produtos = await prisma.produto.findMany({
         where: {
           categoria
-        }
+        },
+        include: incluirFotos
       })
 
       return res.status(200).json(produtos)
@@ -166,7 +218,8 @@ class ProdutoController {
       const produto = await prisma.produto.findUnique({
         where: {
           id: parseInt(id)
-        }
+        },
+        include: incluirFotos
       })
 
       if (!produto) {
@@ -213,34 +266,97 @@ class ProdutoController {
         preco
       } = req.body
 
-      let foto = produtoAtual.foto
+      const arquivos = obterArquivos(req)
 
-      // Se uma nova imagem foi enviada,
-      // envia para o Supabase
-      if (req.file) {
-
-        foto = await uploadImagem(req.file)
-
-        // Remove a imagem antiga do Supabase
-        await excluirImagemSupabase(produtoAtual.foto)
+      if (arquivos.length > 10) {
+        return res.status(400).json({
+          error: 'Envie no máximo 10 fotos por atualização.'
+        })
       }
 
-      const produto = await prisma.produto.update({
-        where: {
-          id: parseInt(id)
-        },
+      const urlsEnviadas = await uploadImagens(arquivos)
+      const possuiFotoPrincipalNova = Boolean(req.files?.foto?.length)
+      const urlFotoPrincipalNova = possuiFotoPrincipalNova
+        ? urlsEnviadas[0]
+        : null
+      const urlsNovas = urlsEnviadas.slice(possuiFotoPrincipalNova ? 1 : 0)
 
-        data: {
-          nome,
-          categoria,
-          estoque: Number(estoque),
-          descricao,
-          foto,
-          preco: Number(preco)
+      try {
+        const produto = await prisma.$transaction(async (transaction) => {
+          let foto = req.body.foto || produtoAtual.foto
+
+          if (urlFotoPrincipalNova) {
+            foto = urlFotoPrincipalNova
+          }
+
+          const produtoAtualizado = await transaction.produto.update({
+            where: {
+              id: parseInt(id)
+            },
+
+            data: {
+              nome,
+              categoria,
+              estoque: Number(estoque),
+              descricao,
+              foto,
+              preco: Number(preco)
+            }
+          })
+
+          if (foto !== produtoAtual.foto) {
+            const imagemPrincipal = await transaction.produtoImagem.findFirst({
+              where: {
+                produtoId: produtoAtual.id,
+                url: produtoAtual.foto
+              }
+            })
+
+            if (imagemPrincipal) {
+              await transaction.produtoImagem.update({
+                where: { id: imagemPrincipal.id },
+                data: { url: foto }
+              })
+            } else {
+              await transaction.produtoImagem.create({
+                data: {
+                  produtoId: produtoAtual.id,
+                  url: foto,
+                  ordem: 0
+                }
+              })
+            }
+          }
+
+          if (urlsNovas.length) {
+            const quantidadeFotos = await transaction.produtoImagem.count({
+              where: { produtoId: produtoAtual.id }
+            })
+
+            await transaction.produtoImagem.createMany({
+              data: urlsNovas.map((url, index) => ({
+                produtoId: produtoAtual.id,
+                url,
+                ordem: quantidadeFotos + index
+              }))
+            })
+          }
+
+          return transaction.produto.findUnique({
+            where: { id: produtoAtualizado.id },
+            include: incluirFotos
+          })
+        })
+
+        if (urlFotoPrincipalNova) {
+          await excluirImagemSupabase(produtoAtual.foto)
         }
-      })
 
-      return res.status(200).json(produto)
+        return res.status(200).json(produto)
+      } catch (error) {
+        await Promise.all(urlsEnviadas.map(excluirImagemSupabase))
+        throw error
+      }
 
     } catch (error) {
 
@@ -261,7 +377,8 @@ class ProdutoController {
       const produto = await prisma.produto.findUnique({
         where: {
           id: parseInt(id)
-        }
+        },
+        include: incluirFotos
       })
 
       if (!produto) {
@@ -270,14 +387,16 @@ class ProdutoController {
         })
       }
 
-      // Remove a imagem do Supabase
-      await excluirImagemSupabase(produto.foto)
-
       await prisma.produto.delete({
         where: {
           id: parseInt(id)
         }
       })
+
+      await Promise.all([
+        produto.foto,
+        ...produto.fotos.map((imagem) => imagem.url)
+      ].map(excluirImagemSupabase))
 
       return res.status(200).json({
         message: 'Produto deletado com sucesso.'
