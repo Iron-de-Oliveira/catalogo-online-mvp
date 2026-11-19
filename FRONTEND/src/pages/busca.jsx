@@ -1,16 +1,26 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import api, { imagemProdutoUrl } from "../services/server";
-import { filtrarProdutos } from "../utils/busca";
+import { filtrarProdutos, normalizarTexto } from "../utils/busca";
 import "../styles/busca.css";
 
 const formatarPreco = (valor) =>
   Number(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
+const categoriasDisponiveis = [
+  { valor: "sala", nome: "Sala" },
+  { valor: "cozinha", nome: "Cozinha" },
+  { valor: "decoracao", nome: "Decoração" },
+  { valor: "moveis", nome: "Móveis" },
+  { valor: "rustico", nome: "Rústicos" },
+  { valor: "pronta entrega", nome: "Pronta entrega" },
+];
+
 export default function Busca() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const termo = (searchParams.get("q") || "").trim();
+  const categoria = (searchParams.get("categoria") || "").trim();
 
   const [campo, setCampo] = useState(termo);
   const [produtos, setProdutos] = useState([]);
@@ -49,7 +59,12 @@ export default function Busca() {
   }, [tentativa]);
 
   const resultados = useMemo(() => {
-    const lista = [...filtrarProdutos(produtos, termo)];
+    const categoriaNormalizada = normalizarTexto(categoria);
+    const lista = filtrarProdutos(produtos, termo).filter(
+      (produto) =>
+        !categoriaNormalizada ||
+        normalizarTexto(produto.categoria).includes(categoriaNormalizada)
+    );
 
     if (ordem === "menor") lista.sort((a, b) => Number(a.preco) - Number(b.preco));
     if (ordem === "maior") lista.sort((a, b) => Number(b.preco) - Number(a.preco));
@@ -58,12 +73,24 @@ export default function Busca() {
     }
 
     return lista;
-  }, [produtos, termo, ordem]);
+  }, [produtos, termo, categoria, ordem]);
 
   function pesquisar(event) {
     event.preventDefault();
     const novoTermo = campo.trim();
-    navigate(novoTermo ? `/busca?q=${encodeURIComponent(novoTermo)}` : "/busca");
+    const parametros = new URLSearchParams();
+    if (novoTermo) parametros.set("q", novoTermo);
+    if (categoria) parametros.set("categoria", categoria);
+    const query = parametros.toString();
+    navigate(query ? `/busca?${query}` : "/busca");
+  }
+
+  function filtrarPorCategoria(novaCategoria) {
+    const parametros = new URLSearchParams();
+    if (termo) parametros.set("q", termo);
+    if (novaCategoria) parametros.set("categoria", novaCategoria);
+    const query = parametros.toString();
+    navigate(query ? `/busca?${query}` : "/busca");
   }
 
   function irParaProduto(id) {
@@ -113,6 +140,21 @@ export default function Busca() {
               <option value="menor">Menor preço</option>
               <option value="maior">Maior preço</option>
               <option value="nome">Nome (A–Z)</option>
+            </select>
+          </label>
+
+          <label className="bs-filtro-categoria">
+            Categoria
+            <select
+              value={categoria}
+              onChange={(event) => filtrarPorCategoria(event.target.value)}
+            >
+              <option value="">Todas as categorias</option>
+              {categoriasDisponiveis.map((item) => (
+                <option key={item.valor} value={item.valor}>
+                  {item.nome}
+                </option>
+              ))}
             </select>
           </label>
         </div>

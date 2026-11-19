@@ -11,7 +11,7 @@ body {
   min-width: 320px;
   overflow-x: hidden;
 }
-
+  
 body {
   background: var(--color-white);
 }
@@ -52,6 +52,39 @@ body {
 
 .back-button:hover {
   transform: scale(1.08);
+}
+
+.produto-busca {
+  display: flex;
+  width: min(600px, 100%);
+  margin: 0 auto 24px;
+}
+
+.produto-busca input {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid rgba(2, 48, 71, .2);
+  border-right: 0;
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+  font-size: 16px;
+}
+
+.produto-busca button {
+  min-width: 90px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--color-navy);
+  color: var(--color-white);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.produto-busca button:hover {
+  background: var(--color-navy-dark);
 }
 
 

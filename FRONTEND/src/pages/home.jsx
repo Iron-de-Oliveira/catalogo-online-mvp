@@ -138,7 +138,12 @@ function Home() {
       return;
     }
 
-    navigate(`/busca?q=${encodeURIComponent(termo)}`);
+    const parametros = new URLSearchParams({ q: termo });
+    if (filtros.categoria) {
+      parametros.set("categoria", filtros.categoria);
+    }
+
+    navigate(`/busca?${parametros.toString()}`);
   }
 
   function limparPesquisaSeVazio(valor) {

@@ -1,11 +1,28 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api, { imagemProdutoUrl } from "../services/server";
+import CarrosselProduto from "../components/CarrosselProduto";
 import "../styles/paginaAdministracao.css";
 
 const MAX_FOTOS = 10;
 const CAMPO_FOTO_PRINCIPAL = "foto";
 const CAMPO_FOTOS_EXTRAS = "fotos";
+
+function listarFotos(produto) {
+  if (!produto) return [];
+
+  const fotos = Array.isArray(produto.fotos)
+    ? [...produto.fotos]
+        .sort((a, b) => a.ordem - b.ordem)
+        .map((item) => item.url)
+    : [];
+
+  if (produto.foto && !fotos.includes(produto.foto)) {
+    fotos.unshift(produto.foto);
+  }
+
+  return [...new Set(fotos)].filter(Boolean).map(imagemProdutoUrl);
+}
 
 export default function PaginaAdministracao() {
   const navigate = useNavigate();
@@ -599,7 +616,11 @@ export default function PaginaAdministracao() {
                 />
 
                 <div className="admin-form-buttons">
-                  <button type="button" className="cancel" onClick={limparFormulario}>
+                  <button
+                    type="button"
+                    className="cancel"
+                    onClick={() => mudarModo("catalogo")}
+                  >
                     Cancelar
                   </button>
 
@@ -630,7 +651,7 @@ export default function PaginaAdministracao() {
               <div>
                 <button
                   className="cancel-small"
-                  onClick={() => setProdutoSelecionado(null)}
+                  onClick={() => mudarModo("catalogo")}
                 >
                   Cancelar
                 </button>
@@ -650,8 +671,9 @@ export default function PaginaAdministracao() {
         {produtoExpandido && (
           <div className="expanded-product-box">
             <div className="expanded-image">
-              <img
-                src={imagemProdutoUrl(produtoExpandido.foto)}
+              <CarrosselProduto
+                key={produtoExpandido.id}
+                imagens={listarFotos(produtoExpandido)}
                 alt={produtoExpandido.nome}
               />
             </div>
