@@ -1,0 +1,118 @@
+.cp {
+  width: 100%;
+  outline: none;
+}
+
+.cp:focus-visible {
+  outline: 3px solid #e0a526;
+  outline-offset: 3px;
+}
+
+.cp-janela {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #fbf6ea;
+}
+
+.cp-trilho {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.cp-slide {
+  flex: 0 0 100%;
+  aspect-ratio: 4 / 3;
+}
+
+.cp-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  cursor: zoom-in;
+  user-select: none;
+}
+
+.cp-seta {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: #1b2a49;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.cp-seta:hover {
+  background: #e0a526;
+}
+
+.cp-seta-esq {
+  left: 10px;
+}
+
+.cp-seta-dir {
+  right: 10px;
+}
+
+.cp-contador {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(27, 42, 73, 0.85);
+  color: #fff;
+  font-size: 0.8rem;
+}
+
+.cp-miniaturas {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.cp-miniaturas button {
+  flex: 0 0 72px;
+  height: 72px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fbf6ea;
+  cursor: pointer;
+  opacity: 0.65;
+}
+
+.cp-miniaturas button.ativa {
+  border-color: #e0a526;
+  opacity: 1;
+}
+
+.cp-miniaturas img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 600px) {
+  .cp-seta {
+    width: 34px;
+    height: 34px;
+  }
+
+  .cp-miniaturas button {
+    flex-basis: 58px;
+    height: 58px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cp-trilho {
+    transition:
