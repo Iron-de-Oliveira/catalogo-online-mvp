@@ -454,10 +454,23 @@ body {
   min-width: 0;
 }
 
-.expanded-image img {
+.expanded-image > img {
   width: 100%;
   height: 320px;
   object-fit: cover;
+}
+
+.expanded-image .cp-janela {
+  border-radius: 0;
+}
+
+.expanded-image .cp-slide {
+  aspect-ratio: 1 / 1;
+}
+
+.expanded-image .cp-slide img {
+  height: 100%;
+  object-fit: contain;
 }
 
 .expanded-info {
