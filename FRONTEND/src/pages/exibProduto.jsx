@@ -30,6 +30,8 @@ export default function ExibProduto() {
 
   const [mostrarAvisoCadastro, setMostrarAvisoCadastro] = useState(false);
 
+  const [termoBusca, setTermoBusca] = useState("");
+
   const [produto, setProduto] = useState(null);
 
   const [relacionados, setRelacionados] = useState([]);
@@ -100,6 +102,12 @@ export default function ExibProduto() {
 
   function irParaProduto(produtoId) {
     navigate(`/produto/${produtoId}`);
+  }
+
+  function pesquisarProdutos(event) {
+    event.preventDefault();
+    const termo = termoBusca.trim();
+    navigate(termo ? `/busca?q=${encodeURIComponent(termo)}` : "/busca");
   }
 
   if (loading) {
@@ -191,6 +199,17 @@ export default function ExibProduto() {
       >
         ❮
       </button>
+
+      <form className="produto-busca" onSubmit={pesquisarProdutos} role="search">
+        <input
+          type="search"
+          value={termoBusca}
+          onChange={(event) => setTermoBusca(event.target.value)}
+          placeholder="Pesquisar produtos..."
+          aria-label="Pesquisar produtos"
+        />
+        <button type="submit">Buscar</button>
+      </form>
 
       {/* TOPO */}
 

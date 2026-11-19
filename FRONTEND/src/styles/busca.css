@@ -123,7 +123,8 @@
   font-size: 15px;
 }
 
-.bs-ordem {
+.bs-ordem,
+.bs-filtro-categoria {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -131,7 +132,8 @@
   font-size: 14px;
 }
 
-.bs-ordem select {
+.bs-ordem select,
+.bs-filtro-categoria select {
   height: 40px;
   padding: 0 10px;
   border: 1px solid #cfd9dc;
