@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import api, { imagemProdutoUrl } from "../services/server";
 import "../styles/paginaAdministracao.css";
 
+const MAX_FOTOS = 10;
+const CAMPO_FOTO_PRINCIPAL = "foto";
+const CAMPO_FOTOS_EXTRAS = "fotos";
+
 export default function PaginaAdministracao() {
   const navigate = useNavigate();
 
@@ -15,6 +19,7 @@ export default function PaginaAdministracao() {
 
   const [imagem, setImagem] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [fotos, setFotos] = useState([]);
 
   const [mensagem, setMensagem] = useState("");
   const [loading, setLoading] = useState(false);
@@ -105,6 +110,55 @@ export default function PaginaAdministracao() {
 
     setImagem(null);
     setPreview(null);
+    limparFotos();
+  }
+
+  function adicionarFotos(e) {
+    const arquivos = Array.from(e.target.files || []);
+    e.target.value = "";
+
+    if (arquivos.length === 0) return;
+
+    const vagas = MAX_FOTOS - fotos.length;
+    const aceitos = arquivos
+      .filter((arquivo) => arquivo.type.startsWith("image/"))
+      .slice(0, vagas);
+
+    if (arquivos.length > vagas) {
+      setMensagem(`Limite de ${MAX_FOTOS} fotos por produto.`);
+    }
+
+    setFotos((atuais) => [
+      ...atuais,
+      ...aceitos.map((file) => ({
+        id: `${file.name}-${file.size}-${file.lastModified}-${Math.random()}`,
+        file,
+        preview: URL.createObjectURL(file)
+      }))
+    ]);
+  }
+
+  function removerFoto(id) {
+    setFotos((atuais) => {
+      const removida = atuais.find((item) => item.id === id);
+      if (removida) URL.revokeObjectURL(removida.preview);
+      return atuais.filter((item) => item.id !== id);
+    });
+  }
+
+  function tornarPrincipal(id) {
+    setFotos((atuais) => {
+      const escolhida = atuais.find((item) => item.id === id);
+      if (!escolhida) return atuais;
+      return [escolhida, ...atuais.filter((item) => item.id !== id)];
+    });
+  }
+
+  function limparFotos() {
+    setFotos((atuais) => {
+      atuais.forEach((item) => URL.revokeObjectURL(item.preview));
+      return [];
+    });
   }
 
   function preencherFormulario(produto) {
@@ -136,10 +190,13 @@ export default function PaginaAdministracao() {
       !formData.nome ||
       !formData.categoria ||
       !formData.estoque ||
+      !formData.descricao ||
       !formData.preco ||
-      !imagem
+      fotos.length === 0
     ) {
-      setMensagem("Preencha todos os campos obrigatórios e selecione uma imagem.");
+      setMensagem(
+        "Preencha todos os campos obrigatórios, inclusive a descrição, e selecione uma imagem."
+      );
       return;
     }
 
@@ -155,7 +212,13 @@ export default function PaginaAdministracao() {
       data.append("descricao", formData.descricao);
       data.append("preco", formData.preco);
       data.append("idAdministrador", formData.idAdministrador);
-      data.append("foto", imagem);
+
+      fotos.forEach((item, indice) => {
+        data.append(
+          indice === 0 ? CAMPO_FOTO_PRINCIPAL : CAMPO_FOTOS_EXTRAS,
+          item.file
+        );
+      });
 
       await api.post("/produtos", data, {
         headers: {
@@ -339,10 +402,13 @@ export default function PaginaAdministracao() {
 
         {modo === "adicionar" && (
           <form className="admin-form-box" onSubmit={criarProduto}>
-            <ImageBox
-              title="Adicionar foto:"
-              preview={preview}
-              onChange={handleImageChange}
+            <MultiImageBox
+              title="Adicionar fotos:"
+              fotos={fotos}
+              max={MAX_FOTOS}
+              onAdd={adicionarFotos}
+              onRemove={removerFoto}
+              onMakeMain={tornarPrincipal}
             />
 
             <div className="admin-form-fields">
@@ -657,6 +723,74 @@ function ImageBox({ title, preview, onChange }) {
         <div>+</div>
         <div>+</div>
         <div>+</div>
+      </div>
+    </div>
+  );
+}
+
+function MultiImageBox({ title, fotos, max, onAdd, onRemove, onMakeMain }) {
+  const cheio = fotos.length >= max;
+
+  return (
+    <div className="image-box">
+      <label>
+        {title} ({fotos.length}/{max})
+      </label>
+
+      <div className="main-image-upload">
+        {fotos[0] ? (
+          <img src={fotos[0].preview} alt="Foto principal" />
+        ) : (
+          <span>+</span>
+        )}
+
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          disabled={cheio}
+          onChange={onAdd}
+        />
+      </div>
+
+      <div className="multi-thumbs">
+        {fotos.map((item, indice) => (
+          <div
+            className={`multi-thumb ${indice === 0 ? "principal" : ""}`}
+            key={item.id}
+          >
+            <img src={item.preview} alt={`Foto ${indice + 1}`} />
+
+            {indice === 0 ? (
+              <span className="multi-thumb-selo">Principal</span>
+            ) : (
+              <button
+                type="button"
+                className="multi-thumb-principal"
+                title="Tornar foto principal"
+                onClick={() => onMakeMain(item.id)}
+              >
+                Tornar
+              </button>
+            )}
+
+            <button
+              type="button"
+              className="multi-thumb-remover"
+              aria-label={`Remover foto ${indice + 1}`}
+              onClick={() => onRemove(item.id)}
+            >
+              ×
+            </button>
+          </div>
+        ))}
+
+        {!cheio && (
+          <label className="multi-thumb multi-thumb-add">
+            +
+            <input type="file" accept="image/*" multiple onChange={onAdd} />
+          </label>
+        )}
       </div>
     </div>
   );

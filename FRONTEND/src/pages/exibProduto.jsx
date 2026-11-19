@@ -1,15 +1,32 @@
 ﻿import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api, { imagemProdutoUrl } from "../services/server";
+import CarrosselProduto from "../components/CarrosselProduto";
 
 import "../styles/exibProduto.css";
+
+function listarFotos(produto) {
+  if (!produto) return [];
+
+  const lista = Array.isArray(produto.fotos)
+    ? [...produto.fotos]
+        .sort((a, b) => a.ordem - b.ordem)
+        .map((item) => item.url)
+    : [];
+
+  if (produto.foto && !lista.includes(produto.foto)) {
+    lista.unshift(produto.foto);
+  }
+
+  return [...new Set(lista)].filter(Boolean).map(imagemProdutoUrl);
+}
 
 export default function ExibProduto() {
   const navigate = useNavigate();
 
   const { id } = useParams();
 
-  const [zoomAtivo, setZoomAtivo] = useState(false);
+  const [zoomSrc, setZoomSrc] = useState(null);
 
   const [produto, setProduto] = useState(null);
 
@@ -76,6 +93,8 @@ export default function ExibProduto() {
   const estoqueIndisponivel = useMemo(() => {
     return produto && Number(produto.estoque) === 0;
   }, [produto]);
+
+  const fotos = useMemo(() => listarFotos(produto), [produto]);
 
   function irParaProduto(produtoId) {
     navigate(`/produto/${produtoId}`);
@@ -165,11 +184,11 @@ export default function ExibProduto() {
 
         <div className="product-image">
 
-          <img
-            src={imagemProdutoUrl(produto.foto)}
+          <CarrosselProduto
+            key={produto.id}
+            imagens={fotos}
             alt={produto.nome}
-            className="main-product-image"
-            onClick={() => setZoomAtivo(true)}
+            onAbrir={setZoomSrc}
           />
 
         </div>
@@ -291,7 +310,7 @@ export default function ExibProduto() {
                 key={item.id}
               >
                 <img
-                  src={item.foto || "/placeholder.png"}
+                  src={imagemProdutoUrl(item.foto)}
                   alt={item.nome}
                   className="related-clickable-image"
                   onClick={() => irParaProduto(item.id)}
@@ -301,13 +320,14 @@ export default function ExibProduto() {
                   {item.nome}
                 </p>
 
-                <div className="card-footer">
+                                <div className="card-footer">
 
                   <span>
                     R$ {Number(item.preco).toFixed(2)}
                   </span>
 
                   <button
+                    type="button"
                     onClick={() => irParaProduto(item.id)}
                   >
                     Ver Mais
@@ -318,22 +338,33 @@ export default function ExibProduto() {
               </div>
 
             ))
+
           )}
 
         </div>
 
       </section>
-      {/* MODAL ZOOM */}
 
-      {zoomAtivo && (
+      {/* MODAL DE ZOOM DA IMAGEM */}
+
+      {zoomSrc && (
         <div
           className="zoom-overlay"
-          onClick={() => setZoomAtivo(false)}
+          onClick={() => setZoomSrc(null)}
+          role="button"
+          tabIndex={0}
+          aria-label="Fechar visualização ampliada"
+          onKeyDown={(event) => {
+            if (event.key === "Escape" || event.key === "Enter") {
+              setZoomSrc(null);
+            }
+          }}
         >
           <img
-            src={imagemProdutoUrl(produto.foto)}
+            src={zoomSrc}
             alt={produto.nome}
             className="zoom-image"
+            onClick={(event) => event.stopPropagation()}
           />
         </div>
       )}
