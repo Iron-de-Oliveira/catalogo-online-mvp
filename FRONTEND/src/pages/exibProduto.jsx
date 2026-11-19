@@ -28,6 +28,8 @@ export default function ExibProduto() {
 
   const [zoomSrc, setZoomSrc] = useState(null);
 
+  const [mostrarAvisoCadastro, setMostrarAvisoCadastro] = useState(false);
+
   const [produto, setProduto] = useState(null);
 
   const [relacionados, setRelacionados] = useState([]);
@@ -148,6 +150,20 @@ export default function ExibProduto() {
     window.open(urlWhatsapp, "_blank");
   }
 
+  function iniciarContatoWhatsapp() {
+    if (localStorage.getItem("token")) {
+      finalizarCompraWhatsapp();
+      return;
+    }
+
+    setMostrarAvisoCadastro(true);
+  }
+
+  function fecharAvisoEContinuar() {
+    setMostrarAvisoCadastro(false);
+    finalizarCompraWhatsapp();
+  }
+
   function compartilharProduto() {
     const link = window.location.href;
 
@@ -227,7 +243,7 @@ export default function ExibProduto() {
 
               <button
                 className="whatsapp-btn"
-                onClick={finalizarCompraWhatsapp}
+                onClick={iniciarContatoWhatsapp}
               >
                 <img src="/whatsapp.png" alt="WhatsApp" />
               </button>
@@ -366,6 +382,46 @@ export default function ExibProduto() {
             className="zoom-image"
             onClick={(event) => event.stopPropagation()}
           />
+        </div>
+      )}
+
+      {mostrarAvisoCadastro && (
+        <div className="cadastro-modal-overlay">
+          <section
+            className="cadastro-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="cadastro-modal-titulo"
+            aria-describedby="cadastro-modal-descricao"
+          >
+            <button
+              type="button"
+              className="cadastro-modal-fechar"
+              onClick={fecharAvisoEContinuar}
+              aria-label="Fechar aviso e continuar para o WhatsApp"
+            >
+              ×
+            </button>
+            <h2 id="cadastro-modal-titulo">Receba novidades e promoções</h2>
+            <p id="cadastro-modal-descricao">
+              Cadastre-se com seu e-mail para receber descontos e ofertas
+              futuras. Você também pode seguir direto para o WhatsApp.
+            </p>
+            <button
+              type="button"
+              className="cadastro-modal-cadastrar"
+              onClick={() => navigate("/login?modo=cadastro")}
+            >
+              Cadastrar com e-mail
+            </button>
+            <button
+              type="button"
+              className="cadastro-modal-login"
+              onClick={() => navigate("/login")}
+            >
+              Já tenho cadastro — fazer login
+            </button>
+          </section>
         </div>
       )}
 
