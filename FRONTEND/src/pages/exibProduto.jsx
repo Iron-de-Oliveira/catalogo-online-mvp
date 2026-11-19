@@ -320,8 +320,55 @@ export default function ExibProduto() {
                   {item.nome}
                 </p>
 
-                <div className="card-footer">
+                                <div className="card-footer">
 
                   <span>
                     R$ {Number(item.preco).toFixed(2)}
                   </span>
+
+                  <button
+                    type="button"
+                    onClick={() => irParaProduto(item.id)}
+                  >
+                    Ver Mais
+                  </button>
+
+                </div>
+
+              </div>
+
+            ))
+
+          )}
+
+        </div>
+
+      </section>
+
+      {/* MODAL DE ZOOM DA IMAGEM */}
+
+      {zoomSrc && (
+        <div
+          className="zoom-overlay"
+          onClick={() => setZoomSrc(null)}
+          role="button"
+          tabIndex={0}
+          aria-label="Fechar visualização ampliada"
+          onKeyDown={(event) => {
+            if (event.key === "Escape" || event.key === "Enter") {
+              setZoomSrc(null);
+            }
+          }}
+        >
+          <img
+            src={zoomSrc}
+            alt={produto.nome}
+            className="zoom-image"
+            onClick={(event) => event.stopPropagation()}
+          />
+        </div>
+      )}
+
+    </div>
+  );
+}
