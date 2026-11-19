@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import api from "../services/server";
 import "../styles/login.css";
 
@@ -58,8 +58,11 @@ function Campo({ id, label, erro, type = "text", ...props }) {
 
 function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
-  const [modo, setModo] = useState("cliente"); // "cliente" | "adm" | "cadastro"
+  const [modo, setModo] = useState(
+    searchParams.get("modo") === "cadastro" ? "cadastro" : "cliente"
+  ); // "cliente" | "adm" | "cadastro"
   const [loginCliente, setLoginCliente] = useState({ email: "", senha: "" });
   const [loginAdmin, setLoginAdmin] = useState({ cpf: "", senha: "" });
   const [cadastro, setCadastro] = useState({ nome: "", email: "", senha: "" });

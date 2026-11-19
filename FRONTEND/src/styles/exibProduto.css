@@ -347,6 +347,77 @@ body {
   animation: zoomIn .2s ease;
 }
 
+.cadastro-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, .62);
+}
+
+.cadastro-modal {
+  position: relative;
+  width: min(440px, 100%);
+  padding: 32px 26px 26px;
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  color: var(--color-navy);
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+
+.cadastro-modal h2 {
+  margin-bottom: 12px;
+  padding: 0 20px;
+  font-family: var(--font-display);
+  font-size: 24px;
+}
+
+.cadastro-modal p {
+  margin-bottom: 22px;
+  line-height: 1.5;
+}
+
+.cadastro-modal-fechar {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  border: 0;
+  background: transparent;
+  color: var(--color-navy);
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.cadastro-modal-cadastrar {
+  width: 100%;
+  min-height: 46px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--color-amber);
+  color: var(--color-navy);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cadastro-modal-login {
+  width: 100%;
+  min-height: 42px;
+  margin-top: 10px;
+  border: 1px solid var(--color-navy);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-navy);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
