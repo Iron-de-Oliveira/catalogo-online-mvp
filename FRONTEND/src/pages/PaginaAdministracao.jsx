@@ -616,7 +616,11 @@ export default function PaginaAdministracao() {
                 />
 
                 <div className="admin-form-buttons">
-                  <button type="button" className="cancel" onClick={limparFormulario}>
+                  <button
+                    type="button"
+                    className="cancel"
+                    onClick={() => mudarModo("catalogo")}
+                  >
                     Cancelar
                   </button>
 
@@ -647,7 +651,7 @@ export default function PaginaAdministracao() {
               <div>
                 <button
                   className="cancel-small"
-                  onClick={() => setProdutoSelecionado(null)}
+                  onClick={() => mudarModo("catalogo")}
                 >
                   Cancelar
                 </button>
