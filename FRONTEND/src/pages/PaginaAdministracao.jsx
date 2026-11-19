@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api, { imagemProdutoUrl } from "../services/server";
 import CarrosselProduto from "../components/CarrosselProduto";
@@ -33,6 +33,7 @@ export default function PaginaAdministracao() {
   const [categoriaFiltro, setCategoriaFiltro] = useState("");
   const [produtoSelecionado, setProdutoSelecionado] = useState(null);
   const [produtoExpandido, setProdutoExpandido] = useState(null);
+  const produtoExpandidoRef = useRef(null);
 
   const [imagem, setImagem] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -72,6 +73,15 @@ export default function PaginaAdministracao() {
       navigate("/login");
     }
   }, [navigate]);
+
+  useEffect(() => {
+    if (produtoExpandido) {
+      produtoExpandidoRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }
+  }, [produtoExpandido]);
 
   async function carregarProdutos() {
     try {
@@ -669,7 +679,7 @@ export default function PaginaAdministracao() {
         )}
 
         {produtoExpandido && (
-          <div className="expanded-product-box">
+          <div className="expanded-product-box" ref={produtoExpandidoRef}>
             <div className="expanded-image">
               <CarrosselProduto
                 key={produtoExpandido.id}
