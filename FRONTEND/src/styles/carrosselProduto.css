@@ -115,4 +115,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .cp-trilho {
-    transition:
+    transition: none !important;
+  }
+}
