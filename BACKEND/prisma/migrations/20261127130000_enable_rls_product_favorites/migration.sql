@@ -1,0 +1,1 @@
+ALTER TABLE "produtos_favoritos" ENABLE ROW LEVEL SECURITY;

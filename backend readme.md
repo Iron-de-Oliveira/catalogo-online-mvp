@@ -146,3 +146,5 @@ com `POST /lista-desejos/:produtoId` e removê-los com
 `20261126220000_add_product_favorites` cria a tabela de favoritos; aplique-a
 com `npx prisma migrate dev` durante o desenvolvimento ou
 `npx prisma migrate deploy` no ambiente de produção.
+Uma migration seguinte habilita Row Level Security na tabela, sem criar policies
+públicas; as operações continuam restritas às rotas autenticadas do backend.
