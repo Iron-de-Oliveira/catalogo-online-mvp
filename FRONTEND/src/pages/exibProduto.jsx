@@ -2,6 +2,9 @@
 import { useNavigate, useParams } from "react-router-dom";
 import api, { imagemProdutoUrl } from "../services/server";
 import CarrosselProduto from "../components/CarrosselProduto";
+import BotaoFavorito from "../components/BotaoFavorito";
+import useListaDesejos from "../hooks/useListaDesejos";
+import { NUMERO_WHATSAPP_LOJA } from "../utils/whatsapp";
 
 import "../styles/exibProduto.css";
 
@@ -23,6 +26,7 @@ function listarFotos(produto) {
 
 export default function ExibProduto() {
   const navigate = useNavigate();
+  const { produtosIds, pendentes, alternarFavorito } = useListaDesejos();
 
   const { id } = useParams();
 
@@ -135,8 +139,6 @@ export default function ExibProduto() {
   }
 
   // 🔵 NÚMERO DA LOJA - troque pelo número real (DDI + DDD + número, só dígitos)
-  const NUMERO_WHATSAPP_LOJA = "5563992679361"; // ex: 55 (Brasil) + DDD + número
-
   function finalizarCompraWhatsapp() {
     if (!produto) return;
 
@@ -191,25 +193,37 @@ export default function ExibProduto() {
   return (
     <div className="showcase-container">
 
-      {/* BOTÃO VOLTAR */}
+      <div className="produto-toolbar">
+        <button
+          type="button"
+          className="back-button"
+          aria-label="Voltar para a página inicial"
+          onClick={() => navigate("/")}
+        >
+          ❮
+        </button>
 
-      <button
-    className="back-button"
-  onClick={() => navigate("/")}
-      >
-        ❮
-      </button>
+        <form className="produto-busca" onSubmit={pesquisarProdutos} role="search">
+          <input
+            type="search"
+            value={termoBusca}
+            onChange={(event) => setTermoBusca(event.target.value)}
+            placeholder="Pesquisar produtos..."
+            aria-label="Pesquisar produtos"
+          />
+          <button type="submit">Buscar</button>
+        </form>
 
-      <form className="produto-busca" onSubmit={pesquisarProdutos} role="search">
-        <input
-          type="search"
-          value={termoBusca}
-          onChange={(event) => setTermoBusca(event.target.value)}
-          placeholder="Pesquisar produtos..."
-          aria-label="Pesquisar produtos"
-        />
-        <button type="submit">Buscar</button>
-      </form>
+        <button
+          type="button"
+          className="wishlist-shortcut"
+          aria-label="Abrir minha lista de desejos"
+          title="Minha lista de desejos"
+          onClick={() => navigate("/lista-desejos")}
+        >
+          ♡
+        </button>
+      </div>
 
       {/* TOPO */}
 
@@ -239,7 +253,6 @@ export default function ExibProduto() {
             <h2>
               {produto.nome}
             </h2>
-
             <span className="old-price">
               De R$ {precoAntigo} por
             </span>
@@ -266,6 +279,16 @@ export default function ExibProduto() {
               >
                 <img src="/whatsapp.png" alt="WhatsApp" />
               </button>
+              <BotaoFavorito
+                className="favorite-button--detalhe"
+                favorito={produtosIds.has(produto.id)}
+                carregando={pendentes.has(produto.id)}
+                onClick={() => alternarFavorito(produto.id)}
+              >
+                {produtosIds.has(produto.id)
+                  ? "Remover dos favoritos"
+                  : "Adicionar à lista de desejos"}
+              </BotaoFavorito>
               <button
                 className="share-btn"
                 onClick={compartilharProduto}

@@ -666,6 +666,7 @@ button {
 }
 
 .product-card {
+  position: relative;
 
   width: 100%;
 
@@ -798,7 +799,6 @@ button {
 }
 
 .loading,
-
 .no-products {
 
   width: 100%;
@@ -812,6 +812,8 @@ button {
   color: var(--color-navy);
 
 }
+
+
 
 @media (max-width: 1024px) {
 

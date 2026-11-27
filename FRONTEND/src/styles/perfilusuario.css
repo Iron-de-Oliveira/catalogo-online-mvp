@@ -94,6 +94,18 @@
   overflow-wrap: anywhere;
 }
 
+.btn-lista-desejos {
+  min-height: 42px;
+  margin-bottom: 16px;
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 8px;
+  background: #005f8f;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .formulario-edicao {
   margin-top: 40px;
   width: min(100%, 700px);

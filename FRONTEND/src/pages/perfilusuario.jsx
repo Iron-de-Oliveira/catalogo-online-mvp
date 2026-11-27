@@ -221,6 +221,13 @@ function PerfilUsuario() {
 
       <div className="dados-container">
         <h1>Dados pessoais</h1>
+        <button
+          type="button"
+          className="btn-lista-desejos"
+          onClick={() => navigate("/lista-desejos")}
+        >
+          ♡ Minha lista de desejos
+        </button>
 
         <div className="dado">
           Nome: {usuario.nome}
