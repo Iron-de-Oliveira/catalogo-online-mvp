@@ -193,25 +193,37 @@ export default function ExibProduto() {
   return (
     <div className="showcase-container">
 
-      {/* BOTÃO VOLTAR */}
+      <div className="produto-toolbar">
+        <button
+          type="button"
+          className="back-button"
+          aria-label="Voltar para a página inicial"
+          onClick={() => navigate("/")}
+        >
+          ❮
+        </button>
 
-      <button
-    className="back-button"
-  onClick={() => navigate("/")}
-      >
-        ❮
-      </button>
+        <form className="produto-busca" onSubmit={pesquisarProdutos} role="search">
+          <input
+            type="search"
+            value={termoBusca}
+            onChange={(event) => setTermoBusca(event.target.value)}
+            placeholder="Pesquisar produtos..."
+            aria-label="Pesquisar produtos"
+          />
+          <button type="submit">Buscar</button>
+        </form>
 
-      <form className="produto-busca" onSubmit={pesquisarProdutos} role="search">
-        <input
-          type="search"
-          value={termoBusca}
-          onChange={(event) => setTermoBusca(event.target.value)}
-          placeholder="Pesquisar produtos..."
-          aria-label="Pesquisar produtos"
-        />
-        <button type="submit">Buscar</button>
-      </form>
+        <button
+          type="button"
+          className="wishlist-shortcut"
+          aria-label="Abrir minha lista de desejos"
+          title="Minha lista de desejos"
+          onClick={() => navigate("/lista-desejos")}
+        >
+          ♡
+        </button>
+      </div>
 
       {/* TOPO */}
 
