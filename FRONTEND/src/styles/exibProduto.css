@@ -251,6 +251,7 @@ body {
 }
 
 .related-products-container .product-card {
+  position: relative;
   width: 100%;
   min-width: 0;
   background: var(--color-amber);
@@ -494,6 +495,8 @@ body {
   .product-info h2 {
     margin-bottom: 26px;
   }
+
+
 
   .whatsapp-area {
     margin-top: 28px;

@@ -1,0 +1,168 @@
+.lista-desejos,
+.lista-desejos * {
+  box-sizing: border-box;
+}
+
+.lista-desejos {
+  min-height: 100vh;
+  padding: clamp(18px, 4vw, 48px);
+  background: #f3f6f6;
+  color: #18262b;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.lista-desejos-topo {
+  max-width: 1200px;
+  margin: 0 auto 28px;
+}
+
+.lista-desejos-topo button {
+  margin-bottom: 18px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #00384a;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.lista-desejos-topo h1 {
+  color: #00384a;
+  font-family: Georgia, serif;
+  font-size: clamp(28px, 4vw, 40px);
+}
+
+.lista-desejos-topo p {
+  margin-top: 8px;
+  color: #566870;
+}
+
+.lista-desejos-grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 18px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.lista-desejos-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #cfd9dc;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.lista-desejos-produto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border: 0;
+  background: #fff;
+  color: #18262b;
+  text-align: left;
+  cursor: pointer;
+}
+
+.lista-desejos-produto img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 5px;
+  background: #f3f6f6;
+  object-fit: cover;
+}
+
+.lista-desejos-produto span {
+  font-family: Georgia, serif;
+  font-size: 18px;
+}
+
+.lista-desejos-produto strong {
+  color: #00384a;
+  font-size: 17px;
+}
+
+.lista-desejos-remover {
+  min-height: 42px;
+  margin: 0 12px 12px;
+  border: 1px solid #b42338;
+  border-radius: 5px;
+  background: #fff;
+  color: #a11b31;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.lista-desejos-remover:disabled {
+  opacity: .6;
+  cursor: wait;
+}
+
+.lista-desejos-negociar {
+  display: flex;
+  justify-content: center;
+  max-width: 1200px;
+  margin: 24px auto 0;
+}
+
+.lista-desejos-negociar button,
+.lista-desejos-vazio button {
+  min-height: 48px;
+  padding: 12px 22px;
+  border: 0;
+  border-radius: 6px;
+  background: #25d366;
+  color: #073b20;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.lista-desejos-vazio {
+  max-width: 720px;
+  margin: 32px auto;
+  padding: 48px 20px;
+  border: 1px dashed #aebdc2;
+  border-radius: 8px;
+  background: #fff;
+  text-align: center;
+}
+
+.lista-desejos-vazio h2 {
+  color: #00384a;
+  font-family: Georgia, serif;
+}
+
+.lista-desejos-vazio p {
+  margin: 10px 0 20px;
+  color: #566870;
+}
+
+.lista-desejos-erro {
+  max-width: 1200px;
+  margin: 0 auto 18px;
+  color: #a11b31;
+}
+
+.lista-desejos button:focus-visible {
+  outline: 3px solid #ffb300;
+  outline-offset: 2px;
+}
+
+@media (max-width: 520px) {
+  .lista-desejos-grade {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .lista-desejos-produto {
+    padding: 8px;
+  }
+
+  .lista-desejos-remover {
+    margin: 0 8px 8px;
+  }
+}

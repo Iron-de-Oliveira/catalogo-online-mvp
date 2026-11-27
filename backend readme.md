@@ -137,3 +137,12 @@ As respostas mantêm `foto` como URL da imagem principal e incluem `fotos`,
 uma lista ordenada de objetos com `id`, `url`, `ordem` e `produtoId`. A migration
 `20261112230000_add_multiple_product_images` cria a tabela de imagens e copia
 para ela a foto principal dos produtos já cadastrados.
+
+## Lista de desejos
+
+Clientes autenticados podem consultar `GET /lista-desejos`, adicionar produtos
+com `POST /lista-desejos/:produtoId` e removê-los com
+`DELETE /lista-desejos/:produtoId`. A lista é individual por conta. A migration
+`20261126220000_add_product_favorites` cria a tabela de favoritos; aplique-a
+com `npx prisma migrate dev` durante o desenvolvimento ou
+`npx prisma migrate deploy` no ambiente de produção.

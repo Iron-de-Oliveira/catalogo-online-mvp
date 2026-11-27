@@ -133,6 +133,8 @@ export default function Busca() {
             )}
           </div>
 
+
+
           <label className="bs-ordem">
             Ordenar por
             <select value={ordem} onChange={(e) => setOrdem(e.target.value)}>

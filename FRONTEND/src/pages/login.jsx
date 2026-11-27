@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import api from "../services/server";
 import "../styles/login.css";
 
@@ -58,6 +58,7 @@ function Campo({ id, label, erro, type = "text", ...props }) {
 
 function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
 
   const [modo, setModo] = useState(
@@ -105,7 +106,8 @@ function LoginPage() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("usuario", JSON.stringify(data.usuario));
 
-      navigate("/");
+      const destino = location.state?.from;
+      navigate(destino ? `${destino.pathname}${destino.search || ""}` : "/");
     } catch (error) {
       console.error(error);
       setAviso({ tipo: "erro", texto: mensagemErro(error, "Erro ao realizar login.") });

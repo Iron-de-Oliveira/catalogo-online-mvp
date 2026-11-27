@@ -2,6 +2,9 @@
 import { useNavigate, useParams } from "react-router-dom";
 import api, { imagemProdutoUrl } from "../services/server";
 import CarrosselProduto from "../components/CarrosselProduto";
+import BotaoFavorito from "../components/BotaoFavorito";
+import useListaDesejos from "../hooks/useListaDesejos";
+import { NUMERO_WHATSAPP_LOJA } from "../utils/whatsapp";
 
 import "../styles/exibProduto.css";
 
@@ -23,6 +26,7 @@ function listarFotos(produto) {
 
 export default function ExibProduto() {
   const navigate = useNavigate();
+  const { produtosIds, pendentes, alternarFavorito } = useListaDesejos();
 
   const { id } = useParams();
 
@@ -135,8 +139,6 @@ export default function ExibProduto() {
   }
 
   // 🔵 NÚMERO DA LOJA - troque pelo número real (DDI + DDD + número, só dígitos)
-  const NUMERO_WHATSAPP_LOJA = "5563992679361"; // ex: 55 (Brasil) + DDD + número
-
   function finalizarCompraWhatsapp() {
     if (!produto) return;
 
@@ -239,7 +241,6 @@ export default function ExibProduto() {
             <h2>
               {produto.nome}
             </h2>
-
             <span className="old-price">
               De R$ {precoAntigo} por
             </span>
@@ -266,6 +267,16 @@ export default function ExibProduto() {
               >
                 <img src="/whatsapp.png" alt="WhatsApp" />
               </button>
+              <BotaoFavorito
+                className="favorite-button--detalhe"
+                favorito={produtosIds.has(produto.id)}
+                carregando={pendentes.has(produto.id)}
+                onClick={() => alternarFavorito(produto.id)}
+              >
+                {produtosIds.has(produto.id)
+                  ? "Remover dos favoritos"
+                  : "Adicionar à lista de desejos"}
+              </BotaoFavorito>
               <button
                 className="share-btn"
                 onClick={compartilharProduto}

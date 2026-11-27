@@ -6,9 +6,18 @@ const upload = require('../middlewares/upload')
 const produtoController = require('../controllers/ProdutoController')
 const administradorController = require('../controllers/AdministradorController')
 const userController = require('../controllers/UserController')
+const listaDesejosController = require('../controllers/ListaDesejosController')
 const authRoutes = require('./authRoutes')
 
 const routes = Router()
+
+function clienteAutenticado(req, res, next) {
+  if (req.user?.role === 'admin') {
+    return res.status(403).json({ error: 'Esta funcionalidade está disponível apenas para clientes.' })
+  }
+
+  return next()
+}
 
 routes.get('/', (req, res) => {
   return res.json({
@@ -17,6 +26,10 @@ routes.get('/', (req, res) => {
 })
 
 routes.use('/auth', authRoutes)
+
+routes.get('/lista-desejos', auth, clienteAutenticado, listaDesejosController.listar)
+routes.post('/lista-desejos/:produtoId', auth, clienteAutenticado, listaDesejosController.adicionar)
+routes.delete('/lista-desejos/:produtoId', auth, clienteAutenticado, listaDesejosController.remover)
 
 routes.post(
   '/administradores',
